@@ -1,0 +1,13 @@
+.node-visibility { display: flex; flex-direction: column; width: 100%; height: 100%; }
+.node-visibility-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 8px 12px; background: #f4f8f7; border-bottom: 1px solid #c8d8d5; font-size: 12px; }
+.node-visibility-toolbar button[aria-pressed="true"] { background: #176b61; color: white; }
+.node-visibility-canvas { flex: 1; min-height: 0; }
+.node-visibility .react-flow__node.selected { outline: 3px solid #168577; outline-offset: 3px; border-radius: 8px; }
+.global-visibility { padding: 12px; border: 1px solid #b9d3cd; border-radius: 10px; margin-bottom: 16px; background: #f4f8f7; }
+.global-visibility h3 { margin: 0 0 8px; }
+.global-visibility p { font-size: 12px; color: #526d69; }
+.global-visibility form { display: flex; flex-wrap: wrap; gap: 6px; }
+.global-visibility input { width: 100%; min-width: 0; }
+.global-visibility ul { padding: 0; list-style: none; max-height: 200px; overflow: auto; }
+.global-visibility li { display: flex; gap: 6px; align-items: center; margin: 6px 0; }
+.global-visibility li span { flex: 1; overflow-wrap: anywhere; font-size: 12px; }

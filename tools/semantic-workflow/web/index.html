@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OTC 语义模型工作台</title><link rel="stylesheet" href="/style.css"></head>
+<body><header><div><span class="brand">OTC · 语义模型工作台</span><p>独立提取工作流 · 人工确认后进入模型 · <a href="/pilot">打开 CDM 数据映射试点</a></p></div><div id="usage"></div></header>
+<main><aside class="navigation"><label for="filter">查找条目或实体</label><input id="filter" placeholder="合约、账户、ETF…"><label class="toggle"><input type="checkbox" id="history">显示历史版本</label><div id="items"></div></aside>
+<section class="workspace"><div class="heading"><div><p id="item-state"></p><h1 id="title">选择一个提取条目</h1></div><button id="refresh">刷新结果</button></div>
+<nav><button data-tab="entities" class="active">实体</button><button data-tab="relations">关系</button><button data-tab="mapping">数据映射</button><button data-tab="evidence">证据</button></nav>
+<p id="message" role="status"></p><div id="content"></div>
+<footer><span id="save-state">模型生成的内容均为待确认候选。</span><div><button id="draft">保存草稿</button><button id="reject">暂不采用</button><button id="accept" class="primary">确认采用</button></div></footer>
+</section></main><script type="module" src="/app.js"></script></body></html>

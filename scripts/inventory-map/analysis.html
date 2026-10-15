@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>数据加工地图 · 沿关系读证据</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/analysis.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#map" id="brand-home"><span class="brand-mark">↗</span><span>数据加工地图<small>PROCESSING ATLAS</small></span></a>
+      <div class="top-actions"><button id="browse-schemas">探索 Schema</button><button id="open-search">搜索任务 / 表</button><a class="baseline-link" href="/baseline" target="_blank" rel="noopener">原加工地图 ↗</a></div>
+    </header>
+    <nav class="toolbar" aria-label="地图路径">
+      <div class="trail"><button id="back" class="square" aria-label="返回上一步" disabled>←</button><button id="home" class="quiet">销售基础表案例</button><div id="breadcrumbs"></div></div>
+      <span class="toolbar-note" id="route-note">关系留在画布，证据在下方展开</span>
+    </nav>
+    <div id="error-banner" class="message error" hidden role="alert"></div>
+    <main>
+      <section id="explorer" class="explorer" hidden aria-labelledby="explorer-title">
+        <div class="section-intro"><p class="eyebrow">从一个对象开始</p><h1 id="explorer-title">选择一个 Schema，进入它的加工关系</h1><p id="explorer-description">搜索已有对象；进入之后，在同一张画布中继续展开。</p></div>
+        <form id="search-form" class="search-form">
+          <label class="search-main"><span class="label-text">名称或 ID</span><input id="object-search" type="search" placeholder="搜索 Schema、表名、任务 ID 或名称" autocomplete="off" /></label>
+          <label id="kind-filter-label"><span class="label-text">对象类型</span><select id="kind-filter"><option value="">任务与表</option><option value="table">表</option><option value="view">视图</option><option value="task">任务</option><option value="schema">Schema</option></select></label>
+          <label id="schema-filter-label"><span class="label-text">限定 Schema</span><input id="schema-filter" type="search" placeholder="可选，如 pdata_n" autocomplete="off" /></label>
+          <button class="primary" type="submit">查找对象 ↗</button>
+        </form>
+        <div class="search-summary"><span id="search-summary" aria-live="polite"></span><button id="search-clear" class="quiet">清除筛选</button></div>
+        <div id="search-results" class="object-grid" aria-live="polite"></div>
+        <button id="search-more" class="load-more" hidden>继续查看</button>
+      </section>
+
+      <section id="map-workspace" aria-label="关系与加工分析">
+        <section class="map-area" aria-labelledby="map-title">
+          <div class="map-heading"><div><p class="eyebrow" id="map-kicker">沿关系继续阅读</p><h1 id="map-title">正在读取销售基础表案例…</h1><p id="map-description"></p></div><div class="map-actions"><button id="browse-current-schema" hidden>继续浏览此 Schema</button><button id="center-focus">以此为中心</button><button id="read-focus" class="primary">阅读当前对象 ↓</button></div></div>
+          <div id="canvas" tabindex="0" aria-label="可拖动加工地图。点击任务或表展开并读取下方分析，点击 Schema 进入区域。">
+            <svg id="map" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="加工关系地图"><defs><marker id="analysis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke" /></marker></defs><g id="scene"></g></svg>
+            <div id="canvas-empty" class="canvas-empty" hidden>此对象暂未收录可展开的关系。下方保留现有证据。</div>
+            <div class="canvas-tools"><button id="zoom-out" aria-label="缩小">−</button><output id="zoom-value">100%</output><button id="zoom-in" aria-label="放大">＋</button><button id="fit">适配全图</button><button id="locate-focus">定位当前对象</button></div>
+          </div>
+          <div class="map-foot"><div class="legend"><span><i class="swatch table"></i>表 / 视图 / 字段</span><span><i class="swatch task"></i>任务</span><span><i class="line-key"></i>加工关系</span><span><i class="line-key schedule"></i>调度依赖</span></div><span id="view-size"></span></div>
+          <p id="map-boundary" class="map-boundary"></p>
+        </section>
+
+        <section id="analysis" class="analysis-area" aria-labelledby="analysis-title">
+          <div class="analysis-heading"><div><p class="eyebrow" id="analysis-kicker">当前对象 · 证据阅读</p><h2 id="analysis-title"></h2><p id="analysis-qualified" class="qualified-name"></p><p id="analysis-description"></p></div><span id="focus-kind" class="kind-pill"></span></div>
+          <div id="edge-insight" class="edge-insight" hidden></div>
+          <div id="observations" class="observations"></div>
+          <div id="questions" class="questions" hidden></div>
+          <div class="evidence-tabs" role="tablist" aria-label="对象证据">
+            <button id="tab-fields" role="tab" aria-selected="true" aria-controls="panel-fields" data-tab="fields">字段与口径 <span id="fields-count"></span></button>
+            <button id="tab-writers" role="tab" aria-selected="false" aria-controls="panel-writers" data-tab="writers" tabindex="-1">写入与表达式 <span id="writers-count"></span></button>
+            <button id="tab-sql" role="tab" aria-selected="false" aria-controls="panel-sql" data-tab="sql" tabindex="-1">SQL 证据</button>
+            <button id="tab-knowledge" role="tab" aria-selected="false" aria-controls="panel-knowledge" data-tab="knowledge" tabindex="-1">公共知识</button>
+          </div>
+          <div id="panel-fields" class="evidence-panel" role="tabpanel" aria-labelledby="tab-fields"></div>
+          <div id="panel-writers" class="evidence-panel" role="tabpanel" aria-labelledby="tab-writers" hidden></div>
+          <div id="panel-sql" class="evidence-panel" role="tabpanel" aria-labelledby="tab-sql" hidden></div>
+          <div id="panel-knowledge" class="evidence-panel" role="tabpanel" aria-labelledby="tab-knowledge" hidden></div>
+        </section>
+        <footer class="evidence-footer"><span id="coverage-text"></span><span id="version-text"></span></footer>
+      </section>
+    </main>
+    <div id="busy" class="busy" hidden role="status">读取本地证据…</div>
+    <script type="module" src="/analysis.js"></script>
+  </body>
+</html>

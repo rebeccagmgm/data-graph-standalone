@@ -1,0 +1,5 @@
+.upstream-scope-panel { padding: 12px; border: 1px dashed #6b928c; border-radius: 10px; margin-bottom: 16px; background: #f5f8f5; }
+.upstream-scope-panel h3 { margin: 0 0 8px; }
+.upstream-scope-panel p, .upstream-scope-panel small { font-size: 12px; color: #526d69; overflow-wrap: anywhere; }
+.upstream-scope-panel form { display: flex; flex-wrap: wrap; gap: 6px; }
+.upstream-scope-panel textarea { box-sizing: border-box; width: 100%; resize: vertical; min-height: 70px; padding: 8px; border: 1px solid #b9d3cd; border-radius: 6px; font: inherit; }

@@ -1,0 +1,590 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sql-static-lineage.local/schemas/table-multi-hop-reconciliation.schema.json",
+  "title": "Table Multi-hop Reconciliation V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactType",
+    "rootTaskId",
+    "generatedAt",
+    "producerIndex",
+    "taskNodes",
+    "tableNodes",
+    "readEdges",
+    "writeEdges",
+    "producerBridges",
+    "scheduleEdges",
+    "terminals",
+    "scheduleSkeleton",
+    "coverage",
+    "limits",
+    "counts",
+    "countSemantics",
+    "issues",
+    "boundaries",
+    "contentHash"
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "tableRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "dataSource", "qualifiedName", "identityStatus"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "identityStatus": { "const": "RESOLVED" } },
+            "required": ["identityStatus"]
+          },
+          "then": {
+            "properties": {
+              "platform": { "type": "string", "minLength": 1 },
+              "dataSource": {
+                "type": "string",
+                "minLength": 1,
+                "not": { "const": "default" }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "platform": { "type": ["string", "null"] },
+        "dataSource": { "type": ["string", "null"] },
+        "qualifiedName": { "type": "string", "minLength": 1 },
+        "identityStatus": {
+          "enum": ["RESOLVED", "QUALIFIED_NAME_ONLY", "AMBIGUOUS"]
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source", "provider", "locator", "observedAt"],
+      "properties": {
+        "source": {
+          "enum": [
+            "INPUT_PACK_TASK",
+            "INPUT_PACK_SQL",
+            "TABLE_PACK",
+            "SQL_PARSE"
+          ]
+        },
+        "provider": { "type": "string", "minLength": 1 },
+        "locator": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": ["string", "null"] },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "contentHash": { "$ref": "#/$defs/sha256" },
+        "detail": { "type": "object" }
+      }
+    },
+    "scheduleEvidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source", "provider", "locator", "observedAt"],
+      "properties": {
+        "source": { "const": "HORAE_RELATION" },
+        "provider": { "type": "string", "minLength": 1 },
+        "locator": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": ["string", "null"] },
+        "detail": { "type": "object" }
+      }
+    },
+    "upstreamDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "primary",
+        "additional",
+        "unknown",
+        "decision",
+        "evidence"
+      ],
+      "properties": {
+        "source": { "const": "ONE_HOP_FINAL_UPSTREAM" },
+        "primary": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "additional": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "unknown": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "decision": {
+          "enum": [
+            "SCHEDULE_DATA_INTERSECTION",
+            "DATA_FALLBACK",
+            "SCHEDULE_FALLBACK",
+            "MULTIPLE_OVERLAPPING_PRODUCERS"
+          ]
+        },
+        "evidence": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "producerIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platform", "dataSource", "qualifiedName"],
+      "properties": {
+        "platform": { "type": "string", "minLength": 1 },
+        "dataSource": {
+          "type": "string",
+          "minLength": 1,
+          "not": { "const": "default" }
+        },
+        "qualifiedName": { "type": "string", "minLength": 1 }
+      }
+    },
+    "partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "expression", "valueStatus", "observedValue"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "expression": { "type": "string", "minLength": 1 },
+        "valueStatus": {
+          "enum": ["OBSERVED_RENDERED_VALUE", "RUNTIME_EXPRESSION", "UNKNOWN"]
+        },
+        "observedValue": { "type": ["string", "null"] }
+      }
+    },
+    "writeObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observationKind",
+        "declaredWriteMode",
+        "sqlWriteKind",
+        "partition",
+        "evidence"
+      ],
+      "properties": {
+        "observationKind": { "enum": ["DIRECT_TARGET", "SQL_EXPLICIT_WRITE"] },
+        "targetEvidenceKind": {
+          "enum": ["DIRECT_PLATFORM_TARGET", "SQL_EXACT_TABLE_TARGET"]
+        },
+        "declaredWriteMode": { "type": ["string", "null"] },
+        "sqlWriteKind": {
+          "type": ["string", "null"],
+          "enum": [
+            "INSERT_OVERWRITE",
+            "INSERT_INTO",
+            "MERGE_INTO",
+            "CTAS",
+            null
+          ]
+        },
+        "writeDirection": { "enum": ["WRITE_CONFIRMED"] },
+        "operationClass": {
+          "enum": [
+            "INSERT_OVERWRITE",
+            "INSERT_INTO",
+            "MERGE_INTO",
+            "CTAS",
+            "PLATFORM_TRANSFER",
+            "DELETE",
+            "TRUNCATE",
+            "UNKNOWN"
+          ]
+        },
+        "dataPathRole": {
+          "enum": ["PRODUCER", "MUTATION_ONLY", "UNKNOWN"]
+        },
+        "partition": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/partition" }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "terminalReason": {
+      "enum": [
+        "TASK_INPUT_PACK_MISSING",
+        "TASK_INPUT_PACK_INVALID",
+        "TASK_INPUT_PACK_AMBIGUOUS",
+        "SQL_PARSE_FAILED",
+        "PARSER_TOPOLOGY_UNKNOWN",
+        "TABLE_IDENTITY_UNRESOLVED",
+        "NO_DIRECT_READS",
+        "NO_CONFIRMED_PRODUCER_OBSERVED",
+        "MULTIPLE_OVERLAPPING_PRODUCERS",
+        "MAX_DEPTH_REACHED",
+        "MAX_TASKS_REACHED",
+        "MAX_EDGES_REACHED",
+        "CYCLE",
+        "ALREADY_DISCOVERED",
+        "TASK_LOCAL_MATERIALIZATION"
+      ]
+    }
+  },
+  "properties": {
+    "schemaVersion": { "const": "1.1.0" },
+    "artifactType": { "const": "TABLE_MULTI_HOP_RECONCILIATION" },
+    "rootTaskId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "producerIndex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contentHash", "inputFingerprint", "status"],
+      "properties": {
+        "contentHash": { "$ref": "#/$defs/sha256" },
+        "inputFingerprint": { "$ref": "#/$defs/sha256" },
+        "status": { "enum": ["VALID_SUCCESS", "VALID_PARTIAL"] }
+      }
+    },
+    "taskNodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "minDepth",
+          "expansionStatus",
+          "taskInputPackStatus",
+          "taskContentHash",
+          "evidence",
+          "upstreamDecision"
+        ],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "minDepth": { "type": "integer", "minimum": 0 },
+          "expansionStatus": { "enum": ["EXPANDED", "TERMINAL", "TRUNCATED"] },
+          "taskInputPackStatus": {
+            "type": ["string", "null"],
+            "enum": [
+              "TASK_INPUT_PACK_MISSING",
+              "TASK_INPUT_PACK_INVALID",
+              "TASK_INPUT_PACK_AMBIGUOUS",
+              "TASK_INPUT_PACK_AVAILABLE",
+              null
+            ]
+          },
+          "taskContentHash": {
+            "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/evidence" }
+          },
+          "upstreamDecision": {
+            "anyOf": [
+              { "$ref": "#/$defs/upstreamDecision" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    },
+    "tableNodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/tableRef" }
+    },
+    "readEdges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "consumerTaskId",
+          "table",
+          "statementIndexes",
+          "eligibleStatementIndexes",
+          "blockedStatementIndexes",
+          "recursionStatus",
+          "blockReasons",
+          "evidence"
+        ],
+        "properties": {
+          "consumerTaskId": { "type": "string", "minLength": 1 },
+          "table": { "$ref": "#/$defs/tableRef" },
+          "statementIndexes": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0 }
+          },
+          "eligibleStatementIndexes": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0 }
+          },
+          "blockedStatementIndexes": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0 }
+          },
+          "recursionStatus": { "enum": ["ELIGIBLE", "BLOCKED"] },
+          "blockReasons": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "SQL_PARSE_FAILED",
+                "PARSER_TOPOLOGY_UNKNOWN",
+                "TABLE_IDENTITY_UNRESOLVED"
+              ]
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/evidence" }
+          }
+        }
+      }
+    },
+    "writeEdges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "producerTaskId",
+          "table",
+          "writes",
+          "producerIndexContentHash"
+        ],
+        "properties": {
+          "producerTaskId": { "type": "string", "minLength": 1 },
+          "table": { "$ref": "#/$defs/producerIdentity" },
+          "writes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/writeObservation" }
+          },
+          "producerIndexContentHash": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    "producerBridges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "consumerTaskId",
+          "table",
+          "producerTaskId",
+          "producerDepth",
+          "producerRole",
+          "readOccurrence"
+        ],
+        "properties": {
+          "consumerTaskId": { "type": "string", "minLength": 1 },
+          "table": { "$ref": "#/$defs/producerIdentity" },
+          "producerTaskId": { "type": "string", "minLength": 1 },
+          "producerDepth": { "type": "integer", "minimum": 1 },
+          "producerRole": {
+            "enum": ["PRIMARY", "ADDITIONAL", "UNKNOWN", "CANDIDATE"]
+          },
+          "readOccurrence": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "occurrenceId",
+                  "readRelationId",
+                  "statementIndex",
+                  "relationPath"
+                ],
+                "properties": {
+                  "occurrenceId": { "type": "string", "minLength": 1 },
+                  "readRelationId": { "type": "string", "minLength": 1 },
+                  "statementIndex": { "type": "integer", "minimum": 0 },
+                  "relationPath": {
+                    "type": "array",
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                }
+              },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    },
+    "scheduleEdges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "consumerTaskId",
+          "producerTaskId",
+          "producerDepth",
+          "evidence"
+        ],
+        "properties": {
+          "consumerTaskId": { "type": "string", "minLength": 1 },
+          "producerTaskId": { "type": "string", "minLength": 1 },
+          "producerDepth": { "type": "integer", "minimum": 1 },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/scheduleEvidence" }
+          }
+        }
+      }
+    },
+    "terminals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "depth", "reason"],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "depth": { "type": "integer", "minimum": 0 },
+          "reason": { "$ref": "#/$defs/terminalReason" },
+          "table": {
+            "oneOf": [
+              { "$ref": "#/$defs/tableRef" },
+              { "$ref": "#/$defs/producerIdentity" }
+            ]
+          },
+          "detail": { "type": "object" }
+        }
+      }
+    },
+    "scheduleSkeleton": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boundary", "parents"],
+      "properties": {
+        "boundary": { "const": "ROOT_DEPTH_1_ONLY" },
+        "parents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["taskId", "taskName", "evidence"],
+            "properties": {
+              "taskId": { "type": "string", "minLength": 1 },
+              "taskName": { "type": ["string", "null"] },
+              "evidence": {
+                "type": "array",
+                "minItems": 1,
+                "items": { "$ref": "#/$defs/scheduleEvidence" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantics",
+        "status",
+        "producerIndexStatus",
+        "taskPacksDiscovered",
+        "taskPacksInvalid",
+        "tablePacksDiscovered",
+        "tablePacksInvalid",
+        "eligibleReadEdges",
+        "blockedReadEdges",
+        "readsWithConfirmedProducer",
+        "readsWithoutConfirmedProducer"
+      ],
+      "properties": {
+        "semantics": { "const": "OBSERVED_EVIDENCE_ONLY" },
+        "status": {
+          "enum": ["COMPLETE_OBSERVED_EVIDENCE", "PARTIAL_EVIDENCE"]
+        },
+        "producerIndexStatus": { "enum": ["VALID_SUCCESS", "VALID_PARTIAL"] },
+        "taskPacksDiscovered": { "type": "integer", "minimum": 0 },
+        "taskPacksInvalid": { "type": "integer", "minimum": 0 },
+        "tablePacksDiscovered": { "type": "integer", "minimum": 0 },
+        "tablePacksInvalid": { "type": "integer", "minimum": 0 },
+        "eligibleReadEdges": { "type": "integer", "minimum": 0 },
+        "blockedReadEdges": { "type": "integer", "minimum": 0 },
+        "readsWithConfirmedProducer": { "type": "integer", "minimum": 0 },
+        "readsWithoutConfirmedProducer": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxDepth",
+        "maxTasks",
+        "maxEdges",
+        "truncated",
+        "truncationReason",
+        "remainingFrontierTasks"
+      ],
+      "properties": {
+        "maxDepth": { "type": "integer", "minimum": 0 },
+        "maxTasks": { "type": "integer", "minimum": 1 },
+        "maxEdges": { "type": "integer", "minimum": 1 },
+        "truncated": { "type": "boolean" },
+        "truncationReason": {
+          "type": ["string", "null"],
+          "enum": [
+            "MAX_DEPTH_REACHED",
+            "MAX_TASKS_REACHED",
+            "MAX_EDGES_REACHED",
+            null
+          ]
+        },
+        "remainingFrontierTasks": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskNodes",
+        "tableNodes",
+        "readEdges",
+        "writeEdges",
+        "producerBridges",
+        "scheduleEdges",
+        "terminals"
+      ],
+      "properties": {
+        "taskNodes": { "type": "integer", "minimum": 0 },
+        "tableNodes": { "type": "integer", "minimum": 0 },
+        "readEdges": { "type": "integer", "minimum": 0 },
+        "writeEdges": { "type": "integer", "minimum": 0 },
+        "producerBridges": { "type": "integer", "minimum": 0 },
+        "scheduleEdges": { "type": "integer", "minimum": 0 },
+        "terminals": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "countSemantics": { "const": "NODE_AND_UNIQUE_EDGE_COUNTS" },
+    "issues": { "type": "array", "items": { "type": "string" } },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "staticSqlOnly",
+        "openCli",
+        "producerCandidatesAreWrites",
+        "partitionScope",
+        "schedulerExecution",
+        "runtimeDelivery",
+        "businessCorrectness"
+      ],
+      "properties": {
+        "staticSqlOnly": { "const": true },
+        "openCli": { "const": "NOT_USED" },
+        "producerCandidatesAreWrites": { "const": false },
+        "partitionScope": { "const": "TASK_TO_TABLE_WRITE" },
+        "schedulerExecution": { "const": "NOT_EVALUATED" },
+        "runtimeDelivery": { "const": "NOT_EVALUATED" },
+        "businessCorrectness": { "const": "NOT_EVALUATED" }
+      }
+    },
+    "contentHash": { "$ref": "#/$defs/sha256" }
+  }
+}

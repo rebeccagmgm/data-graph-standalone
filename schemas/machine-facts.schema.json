@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.titans-cognition/machine-facts.schema.json",
+  "title": "TITANS Machine Facts V1",
+  "type": "object",
+  "required": ["schema_version", "task_id", "logical_source_id", "status", "inputs", "method", "outputs", "counts", "gates", "boundaries"],
+  "properties": {
+    "schema_version": { "const": "1.3.0" },
+    "task_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "logical_source_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$" },
+    "status": { "const": "SUCCESS" },
+    "inputs": {
+      "type": "object",
+      "required": ["sql_sha256", "sql_snapshot", "schema_bundle_sha256", "schema_snapshot", "analysis_config_sha256"]
+    },
+    "method": {
+      "type": "object",
+      "required": ["dialect", "parser", "adapter", "plan_adapter"],
+      "properties": {
+        "parser": { "type": "object", "required": ["engine", "version"] },
+        "adapter": { "type": "object", "required": ["name", "version"], "properties": { "name": { "const": "machine-facts-writer" }, "version": { "type": "string" } } },
+        "plan_adapter": { "type": "object", "required": ["name", "version"], "properties": { "name": { "const": "plan-adapter" }, "version": { "type": "string" } } }
+      }
+    },
+    "outputs": { "type": "array", "items": { "type": "object", "required": ["path", "schema_version", "row_count", "content_sha256"] } },
+    "counts": {
+      "type": "object",
+      "required": ["lineage_hop_roots", "lineage_hop_nodes", "lineage_hop_edges", "lineage_hop_projected_roots", "lineage_hop_partial_roots", "lineage_hop_not_evaluable_roots"]
+    },
+    "gates": {
+      "type": "object",
+      "required": ["lineage_hop_endpoints", "lineage_hop_acyclic", "lineage_hop_status_truth_table", "lineage_hop_origin_conservation"]
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["business_logic_correctness", "runtime_execution", "business_rows_read", "external_model_calls", "cross_task_field_stitching"]
+    }
+  }
+}

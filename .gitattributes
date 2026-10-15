@@ -1,0 +1,3 @@
+# Frozen evidence fixtures preserve source bytes used by content-hash assertions.
+tests/fixtures/reconcile-one-hop/86840-input-pack/** -whitespace
+tests/fixtures/target-field-causal-slice/semantic-gold/*.sql text eol=lf

@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sql-static-lineage.local/schemas/task-input-pack-task.schema.json",
+  "title": "Task Input Pack V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "taskCategory",
+    "sqlFiles",
+    "collectedAt",
+    "contentHash"
+  ],
+  "$defs": {
+    "taskEndpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "type": ["string", "null"] },
+        "qualifiedName": { "type": ["string", "null"] },
+        "dataSource": { "type": ["string", "null"] }
+      }
+    },
+    "codeEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidenceProvider"],
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "codePathStatus": { "type": "string", "minLength": 1 },
+        "codePath": { "type": "string", "minLength": 1 },
+        "scriptParams": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "repositoryPath": { "type": "string", "minLength": 1 },
+        "commit": { "type": "string", "minLength": 1 },
+        "evidenceProvider": { "type": "string", "minLength": 1 }
+      }
+    },
+    "schedulerEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidenceProvider"],
+      "properties": {
+        "hivePartition": { "type": "string", "minLength": 1 },
+        "evidenceProvider": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "taskId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+    },
+    "taskCategory": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+    },
+    "taskType": { "type": ["string", "null"], "minLength": 1 },
+    "taskName": { "type": ["string", "null"], "minLength": 1 },
+    "topicName": { "type": ["string", "null"], "minLength": 1 },
+    "scheduleCycle": { "type": ["string", "null"], "minLength": 1 },
+    "scheduleStatus": { "type": ["string", "null"], "minLength": 1 },
+    "upstreamTaskIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+      },
+      "uniqueItems": true
+    },
+    "downstreamTaskIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+      },
+      "uniqueItems": true
+    },
+    "source": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/taskEndpoint" }
+      ]
+    },
+    "target": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "minLength": 1 },
+        { "$ref": "#/$defs/taskEndpoint" }
+      ]
+    },
+    "targetEvidenceKind": {
+      "type": ["string", "null"],
+      "enum": [
+        "DIRECT_PLATFORM_TARGET",
+        "TABLE_TASK_RELATION_DIRECTION_UNKNOWN",
+        "SQL_EXACT_TABLE_TARGET",
+        null
+      ]
+    },
+    "writeMode": { "type": ["string", "null"], "minLength": 1 },
+    "partition": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": { "type": "string", "minLength": 1 },
+          "propertyNames": { "pattern": "^[^=\\s]+$" },
+          "minProperties": 1
+        },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": { "type": "string", "minLength": 1 },
+            "propertyNames": { "pattern": "^[^=\\s]+$" },
+            "minProperties": 1
+          }
+        }
+      ]
+    },
+    "schedulerEvidence": { "$ref": "#/$defs/schedulerEvidence" },
+    "codeEvidence": { "$ref": "#/$defs/codeEvidence" },
+    "sqlFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["slot", "path", "sha256", "evidenceProvider"],
+        "properties": {
+          "slot": {
+            "enum": ["create", "query", "prepare", "truncate", "finish"]
+          },
+          "path": {
+            "pattern": "^sql/(create|query|prepare|truncate|finish)\\.sql$"
+          },
+          "sha256": { "pattern": "^[a-f0-9]{64}$" },
+          "evidenceProvider": { "type": "string", "minLength": 1 }
+        }
+      },
+      "uniqueItems": true
+    },
+    "evidenceProvider": { "type": "string", "minLength": 1 },
+    "collectedAt": { "type": "string", "minLength": 1 },
+    "contentHash": { "pattern": "^[a-f0-9]{64}$" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["targetEvidenceKind"],
+        "properties": {
+          "targetEvidenceKind": {
+            "const": "TABLE_TASK_RELATION_DIRECTION_UNKNOWN"
+          }
+        }
+      },
+      "then": {
+        "required": ["target", "evidenceProvider"],
+        "properties": {
+          "target": {
+            "type": "object",
+            "required": ["platform", "qualifiedName", "dataSource"]
+          },
+          "evidenceProvider": { "pattern": "table-task-relation" }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["targetEvidenceKind"],
+        "properties": {
+          "targetEvidenceKind": { "const": "DIRECT_PLATFORM_TARGET" }
+        }
+      },
+      "then": {
+        "required": ["target"],
+        "properties": { "target": { "not": { "type": "null" } } }
+      }
+    },
+    {
+      "if": {
+        "required": ["targetEvidenceKind"],
+        "properties": {
+          "targetEvidenceKind": { "const": "SQL_EXACT_TABLE_TARGET" }
+        }
+      },
+      "then": {
+        "required": ["target", "evidenceProvider"],
+        "properties": {
+          "target": {
+            "type": "object",
+            "required": ["platform", "qualifiedName", "dataSource"]
+          },
+          "evidenceProvider": {
+            "allOf": [
+              { "pattern": "sql-mcp:explicit-table-target" },
+              { "pattern": "opencli:szdata.table" }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

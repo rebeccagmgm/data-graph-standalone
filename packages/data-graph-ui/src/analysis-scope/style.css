@@ -1,0 +1,208 @@
+.analysis-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.analysis-app .analysis-exit,
+.analysis-open {
+  border: 1px solid #83bbb0;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: #eef6f2;
+  color: #174b48;
+  cursor: pointer;
+}
+.analysis-panel {
+  padding: 16px;
+}
+.analysis-panel > label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.analysis-panel input:not([type="checkbox"]),
+.analysis-panel select,
+.analysis-panel textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #bfd0cb;
+  border-radius: 5px;
+  padding: 7px;
+  background: white;
+}
+.analysis-panel textarea {
+  resize: vertical;
+  font: 12px monospace;
+}
+.analysis-panel button,
+.analysis-boundary button,
+.analysis-toolbar button {
+  border: 1px solid #aac7c0;
+  border-radius: 5px;
+  padding: 6px 8px;
+  background: white;
+  color: #235e59;
+  cursor: pointer;
+  font-size: 12px;
+}
+.analysis-app button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.analysis-app button.primary {
+  background: #236e65;
+  color: white;
+}
+.analysis-presets {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+}
+.analysis-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.analysis-panel small {
+  color: #6b807a;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.analysis-import {
+  border-block: 1px solid #d4dfdb;
+  margin: 14px 0;
+  padding: 12px 0;
+}
+.analysis-import summary {
+  margin-bottom: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.analysis-import select,
+.analysis-import textarea {
+  margin-bottom: 6px;
+}
+.analysis-import form {
+  margin-top: 12px;
+}
+.analysis-search-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border-bottom: 1px solid #dbe5e1;
+  padding: 8px 0;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.analysis-search-row span {
+  flex: 1;
+  min-width: 0;
+}
+.analysis-search-row small {
+  display: block;
+}
+.analysis-list-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin: 16px 0 10px;
+}
+.analysis-list-title b {
+  color: #986c28;
+}
+.analysis-group {
+  margin: 0 0 10px;
+  border: 1px solid #d1dfd8;
+  border-radius: 6px;
+  padding: 8px;
+}
+.analysis-group summary {
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding-bottom: 6px;
+}
+.analysis-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 5px 0;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.analysis-panel .analysis-check input {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  margin: 2px 0 0;
+  flex: 0 0 14px;
+}
+.analysis-check span {
+  min-width: 0;
+  flex: 1;
+}
+.analysis-check small {
+  display: block;
+  max-height: 30px;
+  overflow: hidden;
+}
+.analysis-toolbar {
+  display: grid;
+  gap: 10px;
+  padding: 14px 18px;
+}
+.analysis-toolbar small {
+  font-size: 11px;
+  color: #667b75;
+}
+.analysis-field-toolbar {
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+.analysis-focus {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  color: #476d63;
+}
+.analysis-focus select {
+  max-width: 290px;
+  font-size: 12px;
+  padding: 5px;
+  border: 1px solid #b8cfc5;
+  border-radius: 5px;
+  background: white;
+}
+.analysis-boundary {
+  margin: 0 16px 8px;
+  border: 1px solid #c9d8d2;
+  border-radius: 6px;
+  padding: 9px 12px;
+  background: #f0f5f2;
+  font-size: 12px;
+}
+.analysis-boundary summary {
+  cursor: pointer;
+}
+.analysis-boundary-list {
+  max-height: 170px;
+  overflow: auto;
+  margin-top: 8px;
+}
+.analysis-boundary-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+}
+.analysis-boundary-list span {
+  overflow-wrap: anywhere;
+}
+.analysis-app .notice,
+.analysis-app .error {
+  flex-shrink: 0;
+}

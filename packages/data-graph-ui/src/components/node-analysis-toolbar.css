@@ -1,0 +1,49 @@
+.node-analysis-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: min(440px, calc(100vw - 32px));
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid #96bfb7;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 3px 12px #163f3926;
+  white-space: nowrap;
+}
+.node-analysis-toolbar button,
+.node-analysis-actions button {
+  padding: 7px 10px;
+  border: 1px solid #a8c8c0;
+  border-radius: 5px;
+  background: #f3f8f6;
+  color: #235e59;
+  font-size: 12px;
+  cursor: pointer;
+}
+.node-analysis-toolbar button:first-child,
+.node-analysis-actions button:first-of-type {
+  background: #236e65;
+  border-color: #236e65;
+  color: white;
+  font-weight: 600;
+}
+.node-analysis-toolbar button:disabled,
+.node-analysis-actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.node-analysis-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #c9ddd7;
+  color: #40665e;
+  font-size: 12px;
+}
+.node-analysis-actions span {
+  flex-basis: 100%;
+  overflow-wrap: anywhere;
+}

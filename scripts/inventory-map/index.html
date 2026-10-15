@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>存量数据地图 · 从全局到任务</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/view.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#overview"
+        ><span class="brand-mark">↗</span
+        ><span>存量数据地图<small>DATA OPERATIONS ATLAS</small></span></a
+      >
+      <div class="header-meta">
+        <span class="live-dot"></span
+        ><span id="snapshot-label">读取本地快照…</span
+        ><button id="coverage-button">覆盖与口径</button
+        ><a href="/baseline" target="_blank" rel="noopener">原加工地图 ↗</a>
+      </div>
+    </header>
+    <main class="workspace">
+      <aside class="navigator" aria-label="主题导航">
+        <div class="nav-intro">
+          <span class="eyebrow">READ THE WHOLE, FOLLOW ONE PATH</span>
+          <h1>从全貌，找到一条路径。</h1>
+          <p>按主题看依赖，沿任务读证据。</p>
+        </div>
+        <button id="home" class="nav-home active">
+          ⌂ <span>全量总览</span
+          ><span id="inventory-badge" class="badge">—</span>
+        </button>
+        <div class="nav-section">
+          <h2>主题目录 <span id="region-total">—</span></h2>
+          <label class="searchbox"
+            ><span>⌕</span
+            ><input
+              id="region-search"
+              type="search"
+              placeholder="搜索主题，如 PDATA、收入"
+              aria-label="搜索主题" /></label
+          ><select id="stage-filter" aria-label="筛选阅读阶段">
+            <option value="">所有阅读阶段</option>
+          </select>
+        </div>
+        <div id="region-list" class="region-list" aria-live="polite"></div>
+        <button id="region-more" class="load-more" hidden>更多主题</button>
+        <div class="nav-footer">
+          全量任务保留 · 未分类可见<br /><span id="version-label">—</span>
+        </div>
+      </aside>
+      <section class="main-area">
+        <div class="commandbar">
+          <nav id="breadcrumbs" aria-label="地图路径">
+            <button data-home>总览</button>
+          </nav>
+          <form id="task-search-form" class="task-search">
+            <input
+              id="task-search"
+              type="search"
+              placeholder="搜索任务 ID、名称或主题"
+              aria-label="搜索任务"
+            /><button type="submit">查找 ↗</button>
+          </form>
+        </div>
+        <div id="error-banner" class="error-banner" hidden role="alert"></div>
+        <section class="metrics" aria-label="库存覆盖">
+          <div>
+            <span>库存任务</span><strong id="metric-tasks">—</strong
+            ><small id="metric-external">源清单完整保留</small>
+          </div>
+          <div>
+            <span>主题</span><strong id="metric-regions">—</strong
+            ><small>按已缓存主题组织</small>
+          </div>
+          <div>
+            <span>去重调度依赖</span><strong id="metric-edges">—</strong
+            ><small id="metric-both">—</small>
+          </div>
+          <div>
+            <span>有 SQL 证据</span><strong id="metric-sql">—</strong
+            ><small>可读取已有正文与采集记录</small>
+          </div>
+        </section>
+        <section class="map-card">
+          <div class="map-heading">
+            <div>
+              <span class="eyebrow" id="map-kicker">01 / 全量总览</span>
+              <h2 id="map-title">任务如何在主题间连接</h2>
+              <p id="map-subtitle">正在计算当前视图…</p>
+            </div>
+            <div class="view-actions">
+              <button id="view-members" hidden>查看全部成员</button
+              ><button id="view-flows" hidden>查看全部流向</button>
+            </div>
+          </div>
+          <div
+            id="map-canvas"
+            tabindex="0"
+            aria-label="关系地图：拖动平移，滚轮缩放，点击区域或任务查看详情"
+          >
+            <svg
+              id="map"
+              xmlns="http://www.w3.org/2000/svg"
+              role="group"
+              aria-label="调度依赖地图"
+            >
+              <defs>
+                <marker
+                  id="arrow"
+                  viewBox="0 0 10 10"
+                  refX="8.5"
+                  refY="5"
+                  markerWidth="5"
+                  markerHeight="5"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke" />
+                </marker>
+              </defs>
+              <g id="scene"></g>
+            </svg>
+            <div id="map-empty" hidden>
+              当前范围没有可展示的跨主题依赖，成员仍可查询。
+            </div>
+            <div class="map-controls">
+              <button id="zoom-out" aria-label="缩小">−</button
+              ><output id="zoom-value">100%</output
+              ><button id="zoom-in" aria-label="放大">＋</button
+              ><button id="fit">适配画布</button>
+            </div>
+          </div>
+          <div class="map-foot">
+            <span
+              ><i class="legend-line"></i> 已缓存调度依赖
+              <i class="legend-dash"></i> 反向／跨阶段连接</span
+            ><span id="map-counts">—</span>
+          </div>
+          <p id="map-boundary" class="boundary">
+            连线是调度配置依赖；不能据此认定 SQL 数据流或实际运行结果。
+          </p>
+        </section>
+        <div class="insights">
+          <section class="insight-card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">WHERE TO START</span>
+                <h2>值得先读的主题</h2>
+              </div>
+              <span>跨主题连接较多</span>
+            </div>
+            <div id="topic-highlights"></div>
+          </section>
+          <section class="insight-card">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">FOLLOW THE DEPENDENCIES</span>
+                <h2>被更多任务依赖</h2>
+              </div>
+              <span>直接下游数 · 非影响任务总数</span>
+            </div>
+            <div id="task-highlights"></div>
+          </section>
+        </div>
+        <footer class="page-footer">
+          <span id="source-period">—</span
+          ><span>本地快照 · 页面不发起外部请求</span>
+        </footer>
+      </section>
+    </main>
+    <aside id="inspector" hidden aria-label="详情面板">
+      <div class="panel-toolbar">
+        <button id="panel-back" hidden>← 返回</button
+        ><span id="panel-kicker">详情</span
+        ><button id="panel-close" aria-label="关闭详情">×</button>
+      </div>
+      <div id="panel-content" tabindex="-1"></div>
+    </aside>
+    <div id="busy" hidden role="status">读取中…</div>
+    <script type="module" src="/view.js"></script>
+  </body>
+</html>

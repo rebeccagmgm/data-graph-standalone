@@ -1,0 +1,19 @@
+{
+  "name": "otc-semantic-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "prepare": "node src/cli.mjs prepare",
+    "extract": "node src/cli.mjs run",
+    "status": "node src/cli.mjs status",
+    "export": "node src/cli.mjs export",
+    "pilot:prepare": "node src/cli.mjs pilot-prepare",
+    "pilot:run": "node src/cli.mjs pilot-run",
+    "pilot:report": "node src/cli.mjs pilot-report",
+    "pilot:revalidate": "node src/cli.mjs pilot-revalidate",
+    "start": "node src/cli.mjs serve"
+  }
+}

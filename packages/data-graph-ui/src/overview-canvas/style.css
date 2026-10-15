@@ -1,0 +1,25 @@
+.overview-canvas { height: 100%; width: 100%; display: flex; flex-direction: column; background: #f5f9f7; color: #315c55; }
+.overview-canvas-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #d1e0db; font-size: 12px; }
+.overview-canvas-toolbar > span { flex: 1; }
+.overview-canvas-toolbar label { display: flex; align-items: center; gap: 6px; }
+.overview-canvas-toolbar input { width: auto; }
+.overview-canvas button { color: #286d63; background: transparent; border: 1px solid #b9d3ca; padding: 5px 8px; border-radius: 4px; font-size: 11px; }
+.overview-canvas button:disabled { opacity: .35; }
+.overview-canvas-stage { flex: 1; min-height: 0; }
+.overview-canvas .react-flow { background: #f5f9f7; }
+.overview-region-card { box-sizing: border-box; width: 220px; height: 148px; border: 1px solid #a8c7be; border-radius: 5px; padding: 10px 12px; background: #ffffff; box-shadow: 0 3px 12px #0002; }
+.overview-region-card strong { display: block; color: #244f47; font-size: 15px; margin: 5px 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.overview-stage { font-size: 10px; color: #6b847d; letter-spacing: .5px; }
+.overview-card-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #6b847d; }
+.overview-card-bottom button { border: none; padding: 0; color: #26786b; }
+.overview-canvas .react-flow__node.selected .overview-region-card { border-color: #26786b; box-shadow: 0 0 0 2px #26786b33; }
+.overview-canvas .react-flow__handle { width: 5px; height: 5px; background: #6f9d92; border: none; }
+.overview-isolated-heading .react-flow__handle { display: none; }
+.overview-canvas-hint { padding: 8px 16px; font-size: 11px; color: #6b847d; border-top: 1px solid #d1e0db; }
+.overview-canvas .react-flow__minimap { width: 140px; height: 85px; background: #eef5f1; }
+
+.overview-canvas.is-expanded { position: fixed; inset: 16px; width: auto; height: auto; z-index: 1000; border: 1px solid #a8c7be; box-shadow: 0 0 0 16px #e8f0ede8; }
+
+.overview-card-topics { height: 49px; margin: 0 0 5px; color: #526e67; font-size: 11px; line-height: 16px; }
+.overview-card-topics > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.overview-card-topics small { color: #758f87; font-size: 10px; }

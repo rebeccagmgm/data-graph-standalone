@@ -1,0 +1,7 @@
+.partition-selector { position: relative; font-size: 13px; }
+.partition-selector summary { cursor: pointer; padding: 8px 12px; border: 1px solid #80a7a1; border-radius: 5px; background: #f3faf8; color: #145d57; }
+.partition-options { position: absolute; z-index: 30; top: 100%; left: 0; width: min(540px, 65vw); max-height: 55vh; overflow: auto; padding: 14px; background: #fff; border: 1px solid #80a7a1; box-shadow: 0 5px 18px #1234; border-radius: 6px; }
+.partition-options p { margin: 0 0 10px; }
+.partition-options label { display: flex; align-items: start; gap: 8px; padding: 9px 4px; border-bottom: 1px solid #e1ebe8; }
+.partition-options small { color: #617773; }
+.partition-buttons { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }

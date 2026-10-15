@@ -1,0 +1,23 @@
+.table-relation-record {
+  border-top: 1px solid #d4dfdb;
+  padding: 12px 0;
+  overflow-wrap: anywhere;
+}
+.table-relation-record pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.table-relation-record button {
+  border: 1px solid #aac7c0;
+  border-radius: 5px;
+  padding: 6px 8px;
+  background: white;
+  color: #235e59;
+  cursor: pointer;
+  font-size: 12px;
+}
+.table-relation-record button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Titans → OTC 数据加工图谱</title>
+  <style>
+    :root {
+      font-family: Inter, "Microsoft YaHei", sans-serif;
+      color: #183335;
+      background: #eff4f1;
+      font-size: 14px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+    }
+    header {
+      padding: 28px 32px 22px;
+      background: #153c3d;
+      color: #fff;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 0 0 12px;
+      letter-spacing: 0.5px;
+    }
+    .sub {
+      color: #b9d4cd;
+      font-size: 13px;
+    }
+    .stats {
+      display: flex;
+      gap: 28px;
+      margin-top: 20px;
+    }
+    .stats b {
+      font-size: 24px;
+      color: #dff1c3;
+      margin-right: 6px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 265px minmax(470px, 1fr) 360px;
+      gap: 16px;
+      padding: 20px;
+      min-height: calc(100vh - 175px);
+    }
+    .card {
+      background: white;
+      border: 1px solid #d7e2dc;
+      border-radius: 12px;
+      padding: 18px;
+      overflow: hidden;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0 0 14px;
+    }
+    .muted {
+      color: #647873;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    input,
+    select,
+    button {
+      font: inherit;
+      border: 1px solid #cbd8d1;
+      border-radius: 7px;
+      padding: 9px;
+      background: #fff;
+      color: #183335;
+    }
+    input {
+      width: 100%;
+    }
+    button {
+      cursor: pointer;
+    }
+    button:hover {
+      background: #eef5e7;
+    }
+    .primary {
+      background: #1e6661;
+      color: white;
+      border-color: #1e6661;
+    }
+    .primary:hover {
+      background: #245a55;
+    }
+    .search {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .item {
+      display: block;
+      text-align: left;
+      width: 100%;
+      margin: 6px 0;
+      padding: 10px;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+    }
+    .item small {
+      display: block;
+      color: #75867f;
+      margin-top: 5px;
+    }
+    .active {
+      border-color: #21766a;
+      background: #edf6ef;
+    }
+    .presets {
+      border-top: 1px solid #e4ebe6;
+      margin-top: 20px;
+      padding-top: 16px;
+    }
+    .toolbar {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .toolbar select {
+      max-width: 230px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+      margin-bottom: 8px;
+    }
+    .graph {
+      background: #f8fbf9;
+      border: 1px solid #e3ebe6;
+      min-height: 490px;
+      border-radius: 8px;
+      overflow: auto;
+    }
+    svg text {
+      font-family: Consolas, "Microsoft YaHei", monospace;
+      font-size: 11px;
+      fill: #203b38;
+    }
+    svg .node {
+      cursor: pointer;
+    }
+    svg .node:hover rect {
+      stroke: #19786d;
+      stroke-width: 2;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      margin: 12px 0;
+      color: #567067;
+    }
+    .line {
+      display: inline-block;
+      width: 23px;
+      border-top: 2px solid #529689;
+      margin-right: 5px;
+    }
+    .dash {
+      border-top-style: dashed;
+      border-color: #a99564;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: #e8f1ed;
+      font-size: 11px;
+      margin: 4px 4px 4px 0;
+    }
+    .terminal-badge {
+      fill: #8a5a16;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .formula {
+      background: #f3f6ef;
+      border-left: 3px solid #8da774;
+      padding: 12px;
+      margin: 12px 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font:
+        12px/1.7 Consolas,
+        monospace;
+    }
+    .detail {
+      max-height: 760px;
+      overflow: auto;
+    }
+    .control {
+      padding: 10px 0;
+      border-bottom: 1px solid #e6ede8;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .error {
+      color: #a43f35;
+      padding: 14px;
+      background: #fff1ed;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+    .empty {
+      padding: 40px 20px;
+      color: #708079;
+      text-align: center;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #f6f8f5;
+      padding: 12px;
+      font:
+        11px/1.7 Consolas,
+        monospace;
+    }
+    details {
+      margin: 12px 0;
+    }
+    summary {
+      cursor: pointer;
+      color: #24685e;
+    }
+    #notice {
+      margin-bottom: 10px;
+    }
+    @media (max-width: 1200px) {
+      .layout {
+        grid-template-columns: 230px 1fr;
+      }
+      .detailcard {
+        grid-column: 1/-1;
+      }
+      .detail {
+        max-height: none;
+      }
+    }
+    @media (max-width: 760px) {
+      .layout {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        margin: 10px 0;
+      }
+      .stats {
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .graph {
+        min-height: 350px;
+      }
+    }
+  </style>
+  <header>
+    <div class="sub">DATA LINEAGE · 逐层查看加工过程</div>
+    <h1>Titans → OTC 数据加工图谱</h1>
+    <div class="sub">从任务与表开始，展开字段来源，再查看公式和加工条件。</div>
+    <div class="stats" id="stats">正在连接已发布图谱…</div>
+  </header>
+  <div class="layout">
+    <aside class="card">
+      <h2>定位任务或表</h2>
+      <form id="search" class="search">
+        <input
+          id="query"
+          placeholder="表名、任务名或 ID"
+          value="t98_otc_deri_comp_sale_info"
+        /><button>查找</button>
+      </form>
+      <div id="results"></div>
+      <div class="presets">
+        <h2>业务验收入口</h2>
+        <div id="presets"></div>
+        <p class="muted">
+          四类产品共同写入 T98
+          的不同分区，可从表级汇总切换到每个任务的字段加工。
+        </p>
+      </div>
+    </aside>
+    <main class="card">
+      <div class="title" id="anchor">选择一个任务开始</div>
+      <div class="toolbar">
+        <select id="layer">
+          <option value="table">任务 / 表加工链</option>
+          <option value="field">字段来源</option>
+          <option value="schedule">调度依赖</option></select
+        ><select id="column" hidden></select
+        ><select id="direction">
+          <option value="up">向上追溯</option>
+          <option value="down">向下影响</option></select
+        ><select id="depth">
+          <option value="2">展开 2 层</option>
+          <option value="4" selected>展开 4 层</option>
+          <option value="6">展开 6 层</option>
+          <option value="10">展开 10 层</option></select
+        ><button id="refresh" class="primary">展开</button>
+      </div>
+      <div id="notice" class="muted"></div>
+      <div id="graph" class="graph"><div class="empty">图谱正在加载</div></div>
+      <div class="legend">
+        <span><i class="line"></i>直接关系 / 已确认接续</span
+        ><span><i class="line dash"></i>候选接续</span>
+      </div>
+      <div id="metrics" class="muted"></div>
+    </main>
+    <aside class="card detailcard">
+      <h2>加工详情</h2>
+      <div id="detail" class="detail">
+        <p class="muted">点击任务、字段节点查看。</p>
+      </div>
+    </aside>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id),
+      esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+    let selected = { taskId: "86842" },
+      fields = [];
+    async function api(path, params = {}) {
+      const r = await fetch(
+        "/api/" +
+          path +
+          "?" +
+          new URLSearchParams(
+            Object.entries(params).filter(([, v]) => v !== undefined),
+          ),
+      );
+      const value = await r.json();
+      if (!r.ok) throw new Error(value.error);
+      return value;
+    }
+    function error(e) {
+      $("notice").className = "error";
+      $("notice").textContent = e.message;
+    }
+    async function search() {
+      const rows = await api("search", { q: $("query").value });
+      $("results").innerHTML =
+        rows
+          .map(
+            (n, i) =>
+              `<button class="item" data-result="${i}">${esc(n.label)}<small>${n.kind === "TASK" ? "任务" : "物理表"} · ${esc(n.id.startsWith("task:") ? n.id.slice(5) : n.table)}</small></button>`,
+          )
+          .join("") || '<p class="muted">没有匹配结果</p>';
+      document
+        .querySelectorAll("[data-result]")
+        .forEach((b) => (b.onclick = () => select(rows[+b.dataset.result])));
+    }
+    async function select(n) {
+      selected =
+        n.kind === "TASK"
+          ? { taskId: n.id.slice(5) }
+          : { table: n.table, nodeId: n.id };
+      $("anchor").textContent = n.label || n.id;
+      $("layer").value = "table";
+      await loadFields();
+      await trace();
+      if (selected.taskId) await detail();
+      else
+        $("detail").innerHTML =
+          '<p class="muted">从加工链选择写入任务，或切换字段来源查看各任务的输出字段。</p>';
+    }
+    async function loadFields() {
+      fields = await api(
+        "fields",
+        selected.taskId
+          ? { taskId: selected.taskId }
+          : { table: selected.table },
+      );
+      $("column").innerHTML = fields
+        .map(
+          (f, i) =>
+            `<option value="${i}">${esc(f.column)} · ${esc(f.taskId)}${fields.filter((x) => x.column === f.column && x.taskId === f.taskId).length > 1 ? " · " + esc(f.writeId) : ""}</option>`,
+        )
+        .join("");
+      const index = fields.findIndex((f) => f.column === "init_nom_prin");
+      if (index >= 0) $("column").value = String(index);
+    }
+    async function trace() {
+      try {
+        $("notice").className = "muted";
+        $("notice").textContent = "正在读取相关关系…";
+        const layer = $("layer").value;
+        let params = {
+          ...selected,
+          layer,
+          direction: $("direction").value,
+          depth: $("depth").value,
+          limit: 150,
+        };
+        if (layer === "field") {
+          const f = fields[+$("column").value];
+          if (!f) {
+            $("graph").innerHTML =
+              '<div class="empty">当前任务尚无可用字段投影；可查看调度依赖或表级加工。</div>';
+            $("notice").textContent = "";
+            return;
+          }
+          params = {
+            taskId: f.taskId,
+            column: f.column,
+            writeId: f.writeId,
+            layer,
+            direction: params.direction,
+            depth: params.depth,
+            limit: 150,
+          };
+          await detail(f.taskId, f.column, f.writeId);
+        }
+        const g = await api("trace", params);
+        render(g);
+        $("notice").textContent = g.truncated
+          ? "当前返回已达 150 条关系，可点击节点缩小范围。"
+          : layer === "schedule"
+            ? "本层表示调度依赖。"
+            : layer === "field"
+              ? "实线是字段直接来源或已确认接续；虚线保留同表、分区待进一步区分的候选。"
+              : "点击加工任务进入字段与公式。";
+        $("metrics").textContent =
+          `${g.nodes.length} 个节点 · ${g.edges.length} 条关系 · 查询 ${g.elapsedMs} ms · 当前范围最多 ${g.depthLimit} 层`;
+      } catch (e) {
+        error(e);
+      }
+    }
+    function render(g) {
+      if (!g.nodes.length) {
+        $("graph").innerHTML = '<div class="empty">本批次没有匹配的节点</div>';
+        return;
+      }
+      const groups = new Map();
+      for (const n of g.nodes) {
+        const d = n.depth ?? 0;
+        if (!groups.has(d)) groups.set(d, []);
+        groups.get(d).push(n);
+      }
+      const maxDepth = Math.max(...groups.keys()),
+        width = Math.max(680, (maxDepth + 1) * 225),
+        height = Math.max(
+          490,
+          ...[...groups.values()].map((a) => a.length * 65 + 60),
+        );
+      const positions = new Map();
+      for (const [d, ns] of groups)
+        ns.forEach((n, i) =>
+          positions.set(n.id, { x: 30 + (maxDepth - d) * 225, y: 30 + i * 75 }),
+        );
+      let html = `<svg width="${width}" height="${height}" role="img" aria-label="局部加工血缘图"><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7f9a8d"/></marker></defs>`;
+      for (const e of g.edges) {
+        const a = positions.get(e.from),
+          b = positions.get(e.to);
+        if (!a || !b) continue;
+        html += `<path d="M ${a.x + 95} ${a.y + 22} C ${a.x + 145} ${a.y + 22}, ${b.x - 35} ${b.y + 22}, ${b.x + 5} ${b.y + 22}" fill="none" stroke="${e.kind === "CANDIDATE" ? "#ad986a" : "#80a698"}" stroke-width="1.2" ${e.kind === "CANDIDATE" ? 'stroke-dasharray="5 4"' : ""} marker-end="url(#arrow)"><title>${esc(e.kind + " " + e.status)}</title></path>`;
+      }
+      g.nodes.forEach((n, i) => {
+        const p = positions.get(n.id),
+          field = n.kind.includes("FIELD"),
+          terminal = g.terminalNodes?.find((x) => x.nodeId === n.id),
+          label = field ? n.column : (n.label || n.id).split(".").at(-1);
+        html += `<g class="node" data-node="${i}" transform="translate(${p.x} ${p.y})"><rect width="192" height="${terminal ? 62 : 46}" rx="7" fill="${terminal ? "#fff3d8" : n.depth === 0 ? "#e2efcf" : n.kind === "TASK" ? "#dcefeb" : "white"}" stroke="${terminal ? "#d39a3d" : "#c9d8ca"}"/><text x="9" y="18">${esc(label.length > 25 ? label.slice(0, 24) + "…" : label)}</text><text x="9" y="35" style="font-size:9px;fill:#6f8177">${esc(field ? n.table.split(".").at(-1) + " · " + n.taskId : n.kind === "TASK" ? "任务 " + n.taskId : n.table.split(".")[0])}</text>${terminal ? '<text x="9" y="53" class="terminal-badge">定义/参数表 · 已按规则停止</text>' : ""}<title>${esc(n.table ? n.table + (n.column ? "." + n.column : "") : n.label)}</title></g>`;
+      });
+      html += "</svg>";
+      $("graph").innerHTML = html;
+      document.querySelectorAll("[data-node]").forEach(
+        (el) =>
+          (el.onclick = async () => {
+            const n = g.nodes[+el.dataset.node];
+            const terminal = g.terminalNodes?.find((x) => x.nodeId === n.id);
+            if (terminal) {
+              await showTerminalDetail(n, terminal);
+              return;
+            }
+            if (n.kind === "TASK") await select(n);
+            else if (n.kind === "PHYSICAL_DATASET") await select(n);
+            else if (n.kind === "WRITE_FIELD") {
+              selected = { taskId: n.taskId };
+              $("anchor").textContent = n.table + "." + n.column;
+              await loadFields();
+              $("column").value = String(
+                fields.findIndex((f) => f.id === n.id),
+              );
+              $("layer").value = "field";
+              $("column").hidden = false;
+              await trace();
+            } else if (n.kind === "READ_FIELD") {
+              const sub = await api("trace", {
+                nodeId: n.id,
+                layer: "field",
+                depth: $("depth").value,
+                limit: 150,
+              });
+              render(sub);
+              $("metrics").textContent =
+                `${sub.nodes.length} 个节点 · ${sub.edges.length} 条关系 · ${sub.elapsedMs} ms`;
+            }
+          }),
+      );
+    }
+    async function showTerminalDetail(n, terminal) {
+      const identity = n.table
+        ? n.table + (n.column ? "." + n.column : "")
+        : n.label || n.id;
+      if (n.taskId) await detail(n.taskId);
+      const predicates = n.detail?.partitionPredicates;
+      const predicateText = Array.isArray(predicates)
+        ? predicates
+            .map((p) => {
+              if (!p || typeof p !== "object") return "";
+              const column = String(p.column || "").trim();
+              const values = Array.isArray(p.values) ? p.values : [];
+              if (!column || !values.length) return "";
+              const quoted = values.map(
+                (value) => `'${String(value).replaceAll("'", "''")}'`,
+              );
+              return values.length === 1
+                ? `${column} = ${quoted[0]}`
+                : `${column} IN (${quoted.join(", ")})`;
+            })
+            .filter(Boolean)
+            .join("\n")
+        : typeof predicates === "string"
+          ? predicates
+          : "";
+      const predicatePanel = predicateText
+        ? `<div class="control"><strong>读取过滤 / 分区条件</strong><div class="formula">${esc(predicateText)}</div></div>`
+        : "";
+      const panel = `<div class="badge" style="background:#fff0cf;color:#7c5115">定义/参数表 · 已按规则停止</div><div class="control"><strong>${esc(identity)}</strong><div class="muted">定义/参数表停止展开</div><details><summary>查看命中规则</summary><div class="muted">${esc(terminal.ruleRef || "未提供")}</div></details></div>${predicatePanel}`;
+      if (n.taskId) $("detail").insertAdjacentHTML("afterbegin", panel);
+      else
+        $("detail").innerHTML =
+          panel +
+          '<p class="muted">该节点是上游读取端的终点，保留当前业务来源与过滤证据。</p>';
+    }
+    async function detail(taskId = selected.taskId, column, writeId) {
+      if (!taskId) return;
+      const d = await api("task", { taskId, column, writeId });
+      const labels = {
+        filter: "过滤条件",
+        join: "Join",
+        aggregate: "分组与聚合",
+        window: "窗口",
+        setop: "分支合并",
+      };
+      $("detail").innerHTML =
+        `<div class="title">${esc(d.taskName || d.taskId)}</div><span class="badge">任务 ${esc(d.taskId)}</span><span class="badge">${esc(d.taskCategory)}</span><span class="badge">${d.coverage === "PROJECTED" ? "字段投影已发布" : "调度与材料范围"}</span>${d.failureReason ? '<p class="muted">材料缺口：' + esc(d.failureReason) + "</p>" : ""}${column ? d.bindings.map((b) => `<div class="control"><strong>${esc(b.column)}</strong><div class="formula">${esc(b.expression ?? "当前没有字段表达式")}</div><div class="muted">${esc(b.writeId)}</div>${b.inputFields.map((f) => '<div class="muted">' + esc(f.table + "." + f.column) + "</div>").join("")}</div>`).join("") : '<p class="muted">已登记 ' + d.bindings.length + " 个字段绑定。切换“字段来源”查看单个字段的公式。</p>"}<h2 style="margin-top:22px">加工条件</h2>${
+          d.controls
+            .slice(0, 35)
+            .map(
+              (c) =>
+                `<div class="control"><b>${esc(labels[c.kind] || c.kind)} ${esc(c.joinType || "")}</b><div>${esc(c.condition || c.sourceText || JSON.stringify(c.groupBy || c.window || "详见 SQL"))}</div></div>`,
+            )
+            .join("") || '<p class="muted">当前没有独立条件记录。</p>'
+        }<details id="sqlDetail"><summary>读取 SQL 原文</summary><div id="sqlBody"></div></details>`;
+      $("sqlDetail").ontoggle = async () => {
+        if (!$("sqlDetail").open || $("sqlBody").children.length) return;
+        const sql = await api("task", { taskId, sql: 1 });
+        $("sqlBody").innerHTML = (sql.sqlSources || [])
+          .map((s) => `<b>${esc(s.slot)}</b><pre>${esc(s.content)}</pre>`)
+          .join("");
+      };
+    }
+    $("search").onsubmit = (e) => {
+      e.preventDefault();
+      search().catch(error);
+    };
+    $("refresh").onclick = trace;
+    $("layer").onchange = () => {
+      $("column").hidden = $("layer").value !== "field";
+      trace();
+    };
+    $("column").onchange = trace;
+    const presets = [
+      ["86840", "01 · 期权本金"],
+      ["86841", "02 · TRS 本金"],
+      ["86842", "03 · 金仕达本金"],
+      ["220650", "04 · 历史 / 当前本金"],
+      ["93338", "销售归属与分配"],
+      ["162610", "销售日报过滤"],
+    ];
+    $("presets").innerHTML = presets
+      .map(
+        ([id, name]) =>
+          `<button class="item" data-task="${id}">${name}<small>任务 ${id}</small></button>`,
+      )
+      .join("");
+    document.querySelectorAll("[data-task]").forEach(
+      (b) =>
+        (b.onclick = () =>
+          select({
+            kind: "TASK",
+            id: "task:" + b.dataset.task,
+            label: b.textContent,
+          })),
+    );
+    (async () => {
+      try {
+        const s = await api("status");
+        $("stats").innerHTML =
+          `<span><b>${s.taskCount.toLocaleString()}</b>任务</span><span><b>${(s.coverage.PROJECTED || 0).toLocaleString()}</b>字段投影</span><span><b>${Object.values(
+            s.counts.edges,
+          )
+            .reduce((a, b) => a + b, 0)
+            .toLocaleString()}</b>直接关系</span>`;
+        await search();
+        await select({
+          kind: "TASK",
+          id: "task:86842",
+          label: "T98 · 金仕达本金加工",
+        });
+      } catch (e) {
+        error(e);
+        $("stats").textContent = "图谱尚未就绪";
+      }
+    })();
+  </script>
+</html>

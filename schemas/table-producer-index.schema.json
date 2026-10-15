@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sql-static-lineage.local/schemas/table-producer-index.schema.json",
+  "title": "Table Producer Index V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "artifactType",
+    "generatedAt",
+    "buildStatus",
+    "coverageSemantics",
+    "inputFingerprint",
+    "confirmedProducerEdges",
+    "nonConfirmedRelations",
+    "intermediateMaterializations",
+    "counts",
+    "issues",
+    "boundaries",
+    "contentHash"
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "tableRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": ["dataSource", "identityStatus"],
+            "properties": {
+              "dataSource": { "const": "default" },
+              "identityStatus": { "const": "RESOLVED" }
+            }
+          }
+        }
+      ],
+      "required": ["platform", "dataSource", "qualifiedName", "identityStatus"],
+      "properties": {
+        "platform": { "type": ["string", "null"] },
+        "dataSource": { "type": ["string", "null"] },
+        "qualifiedName": { "type": ["string", "null"] },
+        "identityStatus": {
+          "enum": ["RESOLVED", "QUALIFIED_NAME_ONLY", "AMBIGUOUS", "UNKNOWN"]
+        }
+      }
+    },
+    "partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "expression", "valueStatus", "observedValue"],
+      "properties": {
+        "field": { "type": "string", "minLength": 1 },
+        "expression": { "type": "string", "minLength": 1 },
+        "valueStatus": {
+          "enum": ["OBSERVED_RENDERED_VALUE", "RUNTIME_EXPRESSION", "UNKNOWN"]
+        },
+        "observedValue": { "type": ["string", "null"] }
+      }
+    },
+    "scriptEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidenceProvider"],
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "codePathStatus": { "type": "string", "minLength": 1 },
+        "codePath": { "type": "string", "minLength": 1 },
+        "scriptParams": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "repositoryPath": { "type": "string", "minLength": 1 },
+        "commit": { "type": "string", "minLength": 1 },
+        "evidenceProvider": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source", "provider", "locator", "observedAt"],
+      "properties": {
+        "source": {
+          "enum": [
+            "INPUT_PACK_TASK",
+            "INPUT_PACK_SQL",
+            "TABLE_PACK",
+            "SQL_PARSE"
+          ]
+        },
+        "provider": { "type": "string", "minLength": 1 },
+        "locator": { "type": "string", "minLength": 1 },
+        "observedAt": { "type": ["string", "null"] },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "contentHash": { "$ref": "#/$defs/sha256" },
+        "detail": { "type": "object" }
+      }
+    },
+    "write": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observationKind",
+        "declaredWriteMode",
+        "sqlWriteKind",
+        "partition",
+        "evidence"
+      ],
+      "properties": {
+        "observationKind": {
+          "enum": ["DIRECT_TARGET", "SQL_EXPLICIT_WRITE"]
+        },
+        "targetEvidenceKind": {
+          "enum": ["DIRECT_PLATFORM_TARGET", "SQL_EXACT_TABLE_TARGET"]
+        },
+        "declaredWriteMode": { "type": ["string", "null"] },
+        "sqlWriteKind": {
+          "type": ["string", "null"],
+          "enum": [
+            "INSERT_OVERWRITE",
+            "INSERT_INTO",
+            "MERGE_INTO",
+            "CTAS",
+            null
+          ]
+        },
+        "writeDirection": {
+          "enum": ["WRITE_CONFIRMED"]
+        },
+        "operationClass": {
+          "enum": [
+            "INSERT_OVERWRITE",
+            "INSERT_INTO",
+            "MERGE_INTO",
+            "CTAS",
+            "PLATFORM_TRANSFER",
+            "DELETE",
+            "TRUNCATE",
+            "UNKNOWN"
+          ]
+        },
+        "dataPathRole": {
+          "enum": ["PRODUCER", "MUTATION_ONLY", "UNKNOWN"]
+        },
+        "scriptEvidence": { "$ref": "#/$defs/scriptEvidence" },
+        "partitionStatus": {
+          "enum": ["NOT_PARTITIONED", "COMPLETE", "INCOMPLETE", "UNKNOWN", "CONFLICT", "LEGACY_UNKNOWN"]
+        },
+        "partitionReasonCodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "partition": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/partition" }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": { "const": "1.1.0" },
+    "artifactType": { "const": "TABLE_PRODUCER_INDEX" },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "buildStatus": { "enum": ["SUCCESS", "PARTIAL"] },
+    "coverageSemantics": { "const": "OBSERVED_EVIDENCE_ONLY" },
+    "inputFingerprint": { "$ref": "#/$defs/sha256" },
+    "confirmedProducerEdges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "table",
+          "taskId",
+          "taskCategory",
+          "taskContentHash",
+          "writes"
+        ],
+        "properties": {
+          "table": {
+            "allOf": [
+              { "$ref": "#/$defs/tableRef" },
+              {
+                "properties": {
+                  "platform": { "type": "string" },
+                  "dataSource": {
+                    "type": "string",
+                    "not": { "const": "default" }
+                  },
+                  "qualifiedName": { "type": "string" },
+                  "identityStatus": { "const": "RESOLVED" }
+                }
+              }
+            ]
+          },
+          "taskId": { "type": "string", "minLength": 1 },
+          "taskCategory": { "type": "string", "minLength": 1 },
+          "taskContentHash": { "$ref": "#/$defs/sha256" },
+          "writes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/write" }
+          }
+        }
+      }
+    },
+    "nonConfirmedRelations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "taskId",
+          "taskCategory",
+          "taskContentHash",
+          "tableRef",
+          "directionStatus",
+          "reasonCodes",
+          "evidence"
+        ],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "taskCategory": { "type": ["string", "null"] },
+          "taskContentHash": {
+            "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+          },
+          "tableRef": { "$ref": "#/$defs/tableRef" },
+          "directionStatus": { "enum": ["WRITE_CONFIRMED", "UNKNOWN"] },
+          "reasonCodes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/evidence" }
+          }
+        }
+      }
+    },
+    "intermediateMaterializations": {
+      "type": "array",
+      "items": { "$ref": "#/properties/nonConfirmedRelations/items" }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskPacksDiscovered",
+        "taskPacksIndexed",
+        "invalidTaskPacks",
+        "tablePacksDiscovered",
+        "tablePacksIndexed",
+        "invalidTablePacks",
+        "confirmedTables",
+        "confirmedProducerEdges",
+        "confirmedWriteObservations",
+        "candidateObservations",
+        "intermediateMaterializations"
+      ],
+      "properties": {
+        "taskPacksDiscovered": { "type": "integer", "minimum": 0 },
+        "taskPacksIndexed": { "type": "integer", "minimum": 0 },
+        "invalidTaskPacks": { "type": "integer", "minimum": 0 },
+        "tablePacksDiscovered": { "type": "integer", "minimum": 0 },
+        "tablePacksIndexed": { "type": "integer", "minimum": 0 },
+        "invalidTablePacks": { "type": "integer", "minimum": 0 },
+        "confirmedTables": { "type": "integer", "minimum": 0 },
+        "confirmedProducerEdges": { "type": "integer", "minimum": 0 },
+        "confirmedWriteObservations": { "type": "integer", "minimum": 0 },
+        "candidateObservations": { "type": "integer", "minimum": 0 },
+        "intermediateMaterializations": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "openCli",
+        "schedulerExecution",
+        "runtimeDelivery",
+        "businessCorrectness",
+        "partitionScope"
+      ],
+      "properties": {
+        "openCli": { "const": "NOT_USED" },
+        "schedulerExecution": { "const": "NOT_EVALUATED" },
+        "runtimeDelivery": { "const": "NOT_EVALUATED" },
+        "businessCorrectness": { "const": "NOT_EVALUATED" },
+        "partitionScope": { "const": "TASK_TO_TABLE_WRITE" }
+      }
+    },
+    "contentHash": { "$ref": "#/$defs/sha256" }
+  }
+}

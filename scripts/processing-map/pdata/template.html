@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>pdata_n · 股衍加工地图</title>
+    <style>
+      /*__STYLE__*/
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#overview"
+        ><span class="brand-mark">↗</span
+        ><span>股衍加工地图<small>PROCESSING ATLAS</small></span></a
+      >
+      <div class="top-actions">
+        <span class="edition">PDATA · 结果与加工阅读图</span
+        ><a href="processing-map.html#overview">原加工总览 ↗</a
+        ><button data-route="scope">范围与证据</button>
+      </div>
+    </header>
+    <nav class="navigation" aria-label="阅读位置">
+      <div class="nav-actions">
+        <button id="back" disabled>← 返回</button>
+        <button id="forward" disabled>前进 →</button>
+        <button id="home">pdata_n 总览</button>
+        <details id="journey">
+          <summary id="journey-count">完整路径</summary>
+          <ol id="journey-list"></ol>
+        </details>
+      </div>
+      <div class="nav-trail">
+        <span>本次路径</span>
+        <div id="breadcrumbs"></div>
+      </div>
+    </nav>
+    <main id="content"></main>
+    <footer>本批可见加工关系 · 静态材料解释，不代表运行接续或实际送达</footer>
+    <script>
+      const DATA = /*__DATA__*/ null;
+    </script>
+    <script>
+      /*__SCRIPT__*/
+    </script>
+  </body>
+</html>

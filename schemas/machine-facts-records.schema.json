@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.titans-cognition/machine-facts-records.schema.json",
+  "title": "TITANS Machine Facts V1 JSONL records",
+  "type": "object",
+  "properties": {
+    "source-artifact.json": { "type": "object", "required": ["schema_version", "task_id", "logical_source_id", "sql_snapshot", "sql_sha256", "byte_length", "encoding"] },
+    "task-fact-index.jsonl": { "type": "object", "required": ["task_id", "logical_source_id", "sql_sha256", "manifest_sha256", "bundle_path", "status"] },
+    "statements.jsonl": { "type": "object", "required": ["statement_id", "task_id", "statement_index", "statement_type", "span", "raw_sql", "parse_status"] },
+    "schema-refs.jsonl": { "type": "object", "required": ["schema_ref_id", "logical_source_id", "qualified_name", "guid", "status", "source", "metadata_qualified_name", "ddl_sha256", "table_status", "required_for_star", "physical_columns", "partition_columns"] },
+    "dataset-io.jsonl": { "type": "object", "required": ["task_id", "direction", "dataset_id", "physical_dataset", "provenance", "resolution_status"], "properties": { "write_kind": { "type": "string" }, "write_observation_id": { "type": "string" }, "write_statement_id": { "type": "string" }, "query_producer_statement_id": { "type": ["string", "null"] }, "source_sql_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "target_resolution_method": { "enum": ["DIRECT_PLATFORM_TARGET", "SPARKINDEX_TASK_TARGET"] }, "query_output_binding_contract": { "enum": ["SPARKINDEX_FULL_WIDTH_POSITIONAL", "PLATFORM_TARGET_SCHEMA_POSITIONAL"] }, "partition_status": { "enum": ["NOT_PARTITIONED", "COMPLETE", "INCOMPLETE", "UNKNOWN", "CONFLICT"] }, "partition_binding_status": { "enum": ["NOT_PARTITIONED", "COMPLETE", "INCOMPLETE", "UNKNOWN", "CONFLICT"] }, "partition_mode": { "enum": ["STATIC", "DYNAMIC", "MIXED", "NONE", "UNKNOWN"] }, "partition_columns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "partition_assignments": { "type": "array", "items": { "type": "object", "required": ["field", "status", "mapping_method", "evidence_refs"], "properties": { "field": { "type": "string", "minLength": 1 }, "status": { "enum": ["CONFIRMED", "RUNTIME_EXPRESSION", "UNKNOWN", "CONFLICT"] }, "mapping_method": { "enum": ["STATIC_SQL_ASSIGNMENT", "DYNAMIC_PARTITION_OUTPUT_ORDINAL", "SCHEDULER_EXPLICIT_FIELD_VALUE", "UNKNOWN", "CONFLICT"] }, "evidence_refs": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "reason": { "type": "string", "minLength": 1 } } } }, "static_partition_columns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "dynamic_partition_columns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "read_occurrences": { "type": "array", "items": { "type": "object", "required": ["occurrence_id", "relation_id", "scope_id", "source_span"] } } } },
+    "relation-nodes.jsonl": { "type": "object", "required": ["relation_id", "task_id", "statement_id", "relation_type", "source_span", "provenance", "relation"] },
+    "relation-edges.jsonl": { "type": "object", "required": ["edge_id", "task_id", "statement_id", "from_relation_id", "to_relation_id", "edge_type", "provenance", "source_span"] },
+    "field-expression-nodes.jsonl": {
+      "type": "object",
+      "required": ["expression_id", "task_id", "statement_id", "relation_id", "role", "ordinal", "expression_text", "source_span", "input_fields", "unresolved_input_columns", "input_dependency_status"],
+      "properties": {
+        "display_text": { "type": "string" },
+        "expression_roles": { "type": "array", "items": { "type": "object", "required": ["operator", "role", "effects", "path", "ordinal", "expression_text", "display_text", "source_span", "input_fields", "unresolved_input_columns", "input_dependency_status"] } },
+        "window_spec": {
+          "type": "object",
+          "required": ["expression_text", "display_text", "source_span", "input_bindings"],
+          "properties": {
+            "input_bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["role", "ordinal", "expression_text", "display_text", "source_span", "input_fields", "unresolved_input_columns", "input_dependency_status"],
+                "properties": {
+                  "role": { "type": "string", "pattern": "^(VALUE|WINDOW_PARTITION|WINDOW_ORDER)$" },
+                  "ordinal": { "type": "number" },
+                  "direction": { "type": "string", "pattern": "^(ASC|DESC)$" },
+                  "nulls": { "type": "string", "pattern": "^(FIRST|LAST|UNSPECIFIED)$" }
+                }
+              }
+            }
+          },
+          "frame": {
+            "type": "object",
+            "required": ["status", "expression_text", "display_text", "source_span", "input_fields", "unresolved_input_columns", "input_dependency_status"],
+            "properties": {
+              "status": { "type": "string", "pattern": "^(EXTRACTED|UNKNOWN)$" },
+              "expression_text": { "type": ["string", "null"] },
+              "display_text": { "type": ["string", "null"] },
+              "source_span": { "type": ["object", "null"] },
+              "input_fields": { "type": "array" },
+              "unresolved_input_columns": { "type": "array" },
+              "input_dependency_status": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "column-lineage-edges.jsonl": { "type": "object", "required": ["edge_id", "task_id", "statement_id", "from_field_id", "to_expression_id", "method", "resolution_provenance"] },
+    "lineage-hop-roots.jsonl": {
+      "type": "object",
+      "required": ["root_id", "task_id", "statement_id", "root_expression_id", "head_hop_id", "coverage_state", "projection_status", "flow_kind", "physical_input_field_ids", "candidate_input_field_ids"],
+      "properties": {
+        "coverage_state": { "type": "string", "pattern": "^(FULL_HOP|FLAT_ORIGIN_ONLY|UNKNOWN_COVERAGE|NOT_EVALUABLE)$" },
+        "projection_status": { "type": "string", "pattern": "^(PROJECTED|PARTIAL_NATIVE|NOT_EVALUABLE)$" },
+        "flow_kind": { "const": "VALUE_LINEAGE" },
+        "physical_input_field_ids": { "type": "array", "items": { "type": "string" } },
+        "candidate_input_field_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "lineage-hop-nodes.jsonl": {
+      "type": "object",
+      "required": ["hop_id", "task_id", "statement_id", "scope_relation_id", "expression_id", "expr_kind", "expression_text", "source_span", "terminal_field_ids", "terminal", "has_downstream", "via_relation_ids", "flow_kind"],
+      "properties": {
+        "terminal": { "type": "string", "pattern": "^(PRESENT|NONE|UNRESOLVED)$" },
+        "has_downstream": { "type": "boolean" },
+        "terminal_field_ids": { "type": "array", "items": { "type": "string" } },
+        "via_relation_ids": { "type": "array", "items": { "type": "object", "required": ["relation_id", "kind"], "properties": { "kind": { "type": "string", "pattern": "^(rename|expand)$" } } } },
+        "flow_kind": { "const": "VALUE_LINEAGE" }
+      }
+    },
+    "lineage-hop-edges.jsonl": {
+      "type": "object",
+      "required": ["edge_id", "task_id", "statement_id", "edge_type", "from_field_id", "from_hop_id", "to_hop_id", "branch_relation_id", "branch_ordinal", "flow_kind"],
+      "properties": {
+        "edge_type": { "type": "string", "pattern": "^(PHYSICAL_FIELD_TO_HOP|HOP_TO_HOP)$" },
+        "from_field_id": { "type": ["string", "null"] },
+        "from_hop_id": { "type": ["string", "null"] },
+        "branch_relation_id": { "type": ["string", "null"] },
+        "branch_ordinal": { "type": ["integer", "null"] },
+        "flow_kind": { "const": "VALUE_LINEAGE" }
+      }
+    },
+    "output-field-bindings.jsonl": { "type": "object", "required": ["binding_id", "task_id", "write_observation_id", "write_kind", "write_statement_id", "query_producer_statement_id", "statement_id", "expression_id", "target_dataset_id", "target_field_id", "target_dataset", "target_field", "source_ordinal", "target_ordinal", "binding_method", "binding_status", "target_schema_status", "static_partition_columns", "evidence_refs"], "properties": { "evidence_kind": { "type": "string", "pattern": "^(SQL_EXPLICIT_WRITE|PACK_DECLARED_QUERY_OUTPUT|PLATFORM_TARGET_QUERY_OUTPUT)$" }, "source_sql_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "static_partition_columns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "dynamic_partition_columns": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true } } },
+    "task-local-materializations.jsonl": { "type": "object", "required": ["bridge_id", "task_id", "logical_source_id", "physical_dataset", "column", "write_observation_id", "write_statement_id", "read_statement_id", "write_statement_index", "read_statement_index", "output_binding_id", "read_expression_ids", "status", "provenance", "evidence_refs"], "properties": { "status": { "type": "string", "pattern": "^(RESOLVED|AMBIGUOUS|UNRESOLVED)$" }, "provenance": { "const": "SAME_TASK_SQL_WRITE_READ" }, "producer_kind": { "enum": ["OUTPUT_BINDING", "STATIC_PARTITION_ASSIGNMENT"] }, "write_observation_id": { "type": ["string", "null"] }, "write_observation_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "write_statement_id": { "type": ["string", "null"] }, "write_statement_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "write_statement_indexes": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "uniqueItems": true }, "output_binding_id": { "type": ["string", "null"] }, "output_binding_ids": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }, "read_expression_ids": { "type": "array", "items": { "type": "string" } }, "read_control_refs": {"type":"array","items":{"type":"object","required":["relation_id","read_relation_id","read_occurrence_id","resolution_status"],"properties":{"relation_id":{"type":"string","minLength":1},"read_relation_id":{"type":["string","null"]},"read_occurrence_id":{"type":["string","null"]},"resolution_status":{"type":"string","pattern":"^(RESOLVED|AMBIGUOUS|UNRESOLVED)$"},"reason_code":{"type":"string","minLength":1}}}}, "evidence_refs": { "type": "array", "items": { "type": "string" } } } },
+    "unknowns.jsonl": { "type": "object", "required": ["outcome_class", "reason_code", "message"] }
+  }
+}

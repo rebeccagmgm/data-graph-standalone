@@ -1,0 +1,37 @@
+{
+  "repositoryRoot": "../..",
+  "outputDirectory": ".local",
+  "sources": [
+    { "kind": "models", "path": "outputs/01a09fc1-t03-t06/workbook-data.json" },
+    { "kind": "interfaces", "path": "outputs/01a0b260-tit-transfer/workbook-data.json" }
+  ],
+  "documentRoots": [
+    "docs/00-20260914-图谱认知/01-tit入模",
+    "docs/00-20260914-图谱认知/第四模块：端到端基础加工推送"
+  ],
+  "metadataDirectory": "../sql-static-lineage-cache/schedule-evidence/tasks-sqlite/table-metadata-catalog",
+  "dictionaryDatabase": "../sql-static-lineage-cache/schedule-evidence/tasks-sqlite/asset-catalog/asset-catalog.sqlite",
+  "sqlDatabase": "../sql-static-lineage-cache/schedule-evidence/tasks-sqlite/schedule-evidence.sqlite",
+  "graphUrl": "http://127.0.0.1:8791",
+  "provider": {
+    "endpointEnv": "SEMANTIC_API_URL",
+    "apiKeyEnv": "SEMANTIC_API_KEY",
+    "model": "external-deepseek-v4-flash",
+    "stream": true,
+    "jsonMode": false,
+    "maxOutputTokens": 32768,
+    "timeoutMs": 300000,
+    "extraBody": { "thinking": { "type": "disabled" } }
+  },
+  "limits": {
+    "totalTokens": 1000000,
+    "maxPackChars": 48000,
+    "pilotMaxPackChars": 128000,
+    "fieldsPerAsset": 65,
+    "tasksPerPack": 2,
+    "sqlCharsPerTask": 3200,
+    "graphBindingsPerTask": 24,
+    "documentsPerPack": 2,
+    "documentChars": 1800
+  }
+}

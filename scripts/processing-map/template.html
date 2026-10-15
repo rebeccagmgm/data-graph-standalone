@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>股衍加工地图 · 从全局到证据</title>
+    <style>
+      /*__STYLE__*/
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="#overview" class="brand" aria-label="返回加工总览"
+        ><span class="brand-mark">↗</span
+        ><span>股衍加工地图<small>PROCESSING ATLAS</small></span></a
+      >
+      <div class="header-meta">
+        <span class="version">知识底图 <b>V0</b></span
+        ><span class="snapshot">固定快照 · 2026.09.06 调查</span
+        ><button id="coverage" class="quiet">覆盖与边界 ↗</button>
+      </div>
+    </header>
+    <nav class="toolbar" aria-label="地图导航">
+      <div class="trail">
+        <button
+          id="back"
+          class="square"
+          aria-label="返回上一层"
+          title="返回上一层"
+        >
+          ←</button
+        ><button id="home">总览</button><span id="crumbs"></span>
+      </div>
+      <div class="tools">
+        <button id="directory">区域目录 <span id="region-count"></span></button
+        ><button id="members" hidden>区域任务</button
+        ><button id="document">阅读知识稿 ↗</button>
+        <button id="sales-reading" class="primary" hidden>合约到创收 ↗</button>
+      </div>
+    </nav>
+    <main id="workspace">
+      <section class="map-area" aria-label="加工关系图">
+        <div class="map-heading">
+          <div>
+            <p class="eyebrow" id="view-index">01 / 全局</p>
+            <h1 id="view-title"></h1>
+            <p id="view-subtitle"></p>
+          </div>
+          <button id="principal-shortcut" class="route-shortcut">
+            已读深的样例 <strong>四产品本金 ↗</strong>
+          </button>
+        </div>
+        <div
+          id="canvas"
+          tabindex="0"
+          aria-label="可拖动加工地图。点击节点展开，点击连线查看证据。使用缩放按钮调整视野。"
+        >
+          <svg
+            id="map"
+            xmlns="http://www.w3.org/2000/svg"
+            role="group"
+            aria-label="数据加工地图"
+          >
+            <defs>
+              <marker
+                id="arrow"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke" />
+              </marker>
+            </defs>
+            <g id="scene"></g>
+          </svg>
+          <div class="map-controls">
+            <button id="zoom-out" aria-label="缩小">−</button
+            ><output id="zoom-value">100%</output
+            ><button id="zoom-in" aria-label="放大">＋</button><span></span
+            ><button id="fit">适配画布</button>
+          </div>
+        </div>
+        <div class="map-foot">
+          <span class="legend"
+            ><i></i>加工 / 输出关联 <i class="dashed"></i>日志 / 参考 /
+            补证</span
+          ><span>拖动画布移动 · 点击区域展开 · Esc 关闭详情</span>
+        </div>
+        <p class="boundary" id="boundary"></p>
+      </section>
+      <aside id="inspector" hidden aria-label="详情">
+        <div class="panel-bar">
+          <button id="panel-back" class="quiet" hidden>← 返回列表</button
+          ><span id="panel-kicker">详情</span
+          ><button id="close-panel" class="square" aria-label="关闭详情">
+            ×
+          </button>
+        </div>
+        <div id="panel-content" tabindex="-1"></div>
+      </aside>
+    </main>
+    <script>
+      const DATA = /*__DATA__*/ null;
+    </script>
+    <script>
+      /*__SCRIPT__*/
+    </script>
+  </body>
+</html>

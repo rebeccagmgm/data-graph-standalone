@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "field-multi-hop-reconciliation.schema.json",
+  "title": "Field Multi-Hop Reconciliation",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "artifactType",
+    "generatedAt",
+    "request",
+    "overallStatus",
+    "rootNodeIds",
+    "nodes",
+    "edges",
+    "datasetControls",
+    "fieldConditionals",
+    "candidates",
+    "gaps",
+    "tableEdges",
+    "limits",
+    "counts",
+    "boundaries",
+    "contentHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.2.0" },
+    "artifactType": { "const": "FIELD_MULTI_HOP_RECONCILIATION" },
+    "generatedAt": { "type": "string", "minLength": 1 },
+    "request": {
+      "type": "object",
+      "required": ["rootTaskId", "rootTable", "rootWriteObservationIds", "rootFields", "factsPolicy"],
+      "properties": {
+        "rootTaskId": { "type": "string", "minLength": 1 },
+        "rootTable": { "type": "string", "minLength": 1 },
+        "rootWriteObservationIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "rootFields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "rootFieldSelection": { "enum": ["EXPLICIT", "ALL_TARGET_COLUMNS"] },
+        "factsPolicy": { "enum": ["current-only", "allow-legacy-partial"] }
+      },
+      "additionalProperties": false
+    },
+    "overallStatus": { "enum": ["COMPLETE", "PARTIAL", "BLOCKED"] },
+    "rootNodeIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "datasetControls": { "type": "array", "items": { "$ref": "#/$defs/datasetControl" } },
+    "fieldConditionals": { "type": "array", "items": { "type": "object" } },
+    "candidates": { "type": "array", "items": { "type": "object" } },
+    "gaps": { "type": "array", "items": { "type": "object" } },
+    "tableEdges": { "type": "array", "items": { "type": "object" } },
+    "limits": { "type": "object", "required": ["maxDepth", "maxStates", "maxPaths", "truncated", "reasons"] },
+    "counts": { "type": "object", "required": ["nodes", "edges", "datasetControls", "fieldConditionals", "candidates", "gaps"] },
+    "boundaries": { "type": "object", "required": ["staticSqlOnly", "runtimeExecution", "dataCorrectness", "businessAcceptance"] },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "physicalField": {
+      "type": "object",
+      "required": ["platform", "dataSource", "stableTableId", "qualifiedName", "column", "identityStatus"],
+      "properties": {
+        "platform": { "type": "string", "minLength": 1 },
+        "dataSource": { "type": "string", "minLength": 1 },
+        "stableTableId": { "type": "string", "minLength": 1 },
+        "qualifiedName": { "type": "string", "minLength": 1 },
+        "column": { "type": "string", "minLength": 1 },
+        "identityStatus": { "enum": ["SCHEMA_BACKED", "TASK_LOCAL_SCHEMA_BACKED"] }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": ["nodeId", "taskId", "taskName", "depth", "field", "bindingId", "expressionId", "expressionText", "evidenceStatus"],
+      "properties": {
+        "nodeId": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "taskName": { "type": ["string", "null"] },
+        "depth": { "type": "integer", "minimum": 0 },
+        "field": { "$ref": "#/$defs/physicalField" },
+        "bindingId": { "type": ["string", "null"] },
+        "expressionId": { "type": ["string", "null"] },
+        "expressionText": { "type": ["string", "null"] },
+        "evidenceStatus": { "enum": ["CONFIRMED", "PROVISIONAL_LEGACY", "UNRESOLVED"] }
+      },
+      "additionalProperties": false
+    },
+    "datasetControl": {
+      "type": "object",
+      "required": [
+        "controlId",
+        "taskId",
+        "statementId",
+        "relationId",
+        "subtype",
+        "masking",
+        "grain",
+        "grainReason",
+        "field",
+        "sourceText",
+        "evidenceStatus",
+        "reasonCode",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "controlId": { "type": "string", "minLength": 1 },
+        "taskId": { "type": "string", "minLength": 1 },
+        "statementId": { "type": "string", "minLength": 1 },
+        "relationId": { "type": ["string", "null"] },
+        "subtype": { "enum": ["JOIN", "GROUP_BY", "FILTER", "SORT", "WINDOW", "CONDITIONAL"] },
+        "masking": { "type": "boolean" },
+        "grain": { "enum": ["REDUCE", "PRESERVE", "EXPAND_RISK", "UNKNOWN"] },
+        "grainReason": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "enum": [
+                "GRAIN_JOIN_CARDINALITY_UNPROVEN",
+                "GRAIN_JOIN_NULLABLE_SIDE_MAY_EXPAND",
+                "GRAIN_GROUPING_REDUCES_ROWS",
+                "GRAIN_SETOP_REDUCES_ROWS",
+                "GRAIN_FILTER_MAY_DROP_ROWS",
+                "GRAIN_WINDOW_CARDINALITY_UNPROVEN"
+              ]
+            }
+          ]
+        },
+        "field": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/physicalField" }] },
+        "sourceText": { "type": ["string", "null"] },
+        "evidenceStatus": { "enum": ["CONFIRMED", "PROVISIONAL_LEGACY", "UNRESOLVED"] },
+        "reasonCode": { "type": ["string", "null"] },
+        "evidenceRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "not": { "required": ["nodeId"] },
+      "additionalProperties": false,
+      "if": {
+        "properties": { "grain": { "not": { "const": "PRESERVE" } } },
+        "required": ["grain"]
+      },
+      "then": {
+        "properties": {
+          "grainReason": {
+            "enum": [
+              "GRAIN_JOIN_CARDINALITY_UNPROVEN",
+              "GRAIN_JOIN_NULLABLE_SIDE_MAY_EXPAND",
+              "GRAIN_GROUPING_REDUCES_ROWS",
+              "GRAIN_SETOP_REDUCES_ROWS",
+              "GRAIN_FILTER_MAY_DROP_ROWS",
+              "GRAIN_WINDOW_CARDINALITY_UNPROVEN"
+            ]
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["edgeId", "fromNodeId", "toNodeId", "consumerTaskId", "producerTaskId", "kind", "mapping", "evidenceStatus", "evidenceRefs"],
+      "properties": {
+        "edgeId": { "type": "string", "minLength": 1 },
+        "fromNodeId": { "type": "string", "minLength": 1 },
+        "toNodeId": { "type": "string", "minLength": 1 },
+        "consumerTaskId": { "type": "string", "minLength": 1 },
+        "producerTaskId": { "type": ["string", "null"] },
+        "kind": { "const": "VALUE_FLOW" },
+        "mapping": { "type": "string", "minLength": 1 },
+        "evidenceStatus": { "enum": ["CONFIRMED", "PROVISIONAL_LEGACY", "UNRESOLVED"] },
+        "evidenceRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
