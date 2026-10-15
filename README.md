@@ -1,5 +1,9 @@
 # Data Graph Code
 
+基于 SQL 与表结构证据构建可复核的表级、字段级血缘图谱，使用 ArcadeDB 存储，提供查询接口及 React 图谱展示。
+
+完整技术路线、分层职责、数据契约、图模型、运行入口和验证边界见 [技术方案](TECHNICAL_DESIGN.md)。当前生成器输出 **1.3.0**，消费端以 **2.0.0** 为当前 L1 门槛；不能把读取支持写成已完成迁移，详见技术方案第 10 节。
+
 保留 SQL 采集、输入清洗与修复、血缘事实加工、图谱构建及查询展示代码。
 
 - `packages/data-graph`：图谱后端、投影与查询。
@@ -14,7 +18,7 @@
 不附原有文档、业务 SQL、业务数据、原项目测试样本、缓存、本机配置及旧提交历史。
 使用时请自行准备依赖、图数据库配置和外部输入。
 
-入口：`input-pack:*` → `input-pack:machine-facts` → `graph:prepare` → `graph:publish`。
+主线入口：采集或缓存导入 → `input-pack:machine-facts` → `graph:prepare` → `graph:publish`。当前生成的 1.3.0 事实按遗留证据分级；发布还需要本机配置、边界规则和实际数据库。
 查询和展示使用 `graph:query`、`graph:serve`、`graph:ui`；`npm test` 验证连接层。
 
 图谱后端通过 Node 原生 `fetch` 调用 ArcadeDB HTTP/JSON API，不依赖 `neo4j-driver`。
