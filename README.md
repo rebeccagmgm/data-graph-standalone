@@ -6,6 +6,8 @@
 
 字段字典、事实关联键、接续算法、缓存与事务、HTTP 接口和 SQL 解释示例见 [实现明细](IMPLEMENTATION_DETAILS.md)。
 
+理解节点、边和稳定 ID，可从 [第 7 节：任务内投影与身份](IMPLEMENTATION_DETAILS.md#7-任务内投影与身份) 开始，按业务视图、读写上下文、存储实现逐层阅读。
+
 保留 SQL 采集、输入清洗与修复、血缘事实加工、图谱构建及查询展示代码。
 
 - `packages/data-graph`：图谱后端、投影与查询。
