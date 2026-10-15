@@ -35,3 +35,9 @@ scripts/asset-catalog/local-snapshot.json
 scripts/inventory-map/analysis-config.json
 scripts/inventory-map/rules.json
 scripts/processing-map/pdata/analysis-*.json
+/scripts/processing-map/
+/scripts/inventory-map/
+/scripts/experiments/
+/scripts/gold-case/
+/scripts/topic-snapshot/
+/tools/

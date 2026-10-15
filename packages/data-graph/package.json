@@ -5,12 +5,9 @@
   "type": "module",
   "description": "Evidence-bounded consumer projections and graph queries for sql-static-lineage artifacts.",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npm run typecheck",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run",
-    "test:real-artifact": "vitest run tests/real-artifact-closed-loop.test.ts --reporter=verbose",
-    "format": "prettier --write package.json README.md src tests",
-    "format:check": "prettier --check package.json README.md src tests",
+    "test": "npm run test:http",
     "query": "tsx src/project-graph/query/file-query-cli.ts",
     "project-topology": "tsx src/project-graph/project-topology-cli.ts",
     "project-topology-view": "tsx src/project-graph/project-topology-view-cli.ts",
@@ -22,10 +19,8 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
-    "prettier": "^3.8.3",
     "tsx": "^4.22.4",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.8"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=24.0.0"

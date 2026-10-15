@@ -1,14 +1,18 @@
 {
-	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"strict": true,
-		"esModuleInterop": true,
-		"allowImportingTsExtensions": true,
-		"skipLibCheck": true,
-		"types": ["node"],
-		"noEmit": true
-	},
-	"include": ["tests"]
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "noEmit": true
+  },
+  "include": [
+    "scripts"
+  ]
 }

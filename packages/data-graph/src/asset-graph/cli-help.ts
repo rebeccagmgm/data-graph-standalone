@@ -2,7 +2,7 @@ export const CLI_HELP = {
   schemaVersion: "1.0.0",
   name: "lineage-graph",
   description:
-    "Query the published Titans OTC graph; read-only commands never generate projections.",
+    "Query a published ArcadeDB asset graph; read-only commands never generate projections.",
   commands: {
     status: "Publication version and coverage.",
     metrics:
@@ -20,14 +20,14 @@ export const CLI_HELP = {
       "--task-id <id> --write-id <exact write id> --column <name> [--publication-version <version>] [--max-depth 32 --max-nodes 500 --max-edges 1000]; complete processing stages from frozen published evidence, including conditions and UNION branches.",
     processing:
       "--task-id <id> [--text <formula fragment>] [--relation-id <exact relation id>] [--offset 0 --limit 25] [--sql --slot query --line-start 1 --line-count 80]",
-    compare: "--task-ids 86840,86841,86842,220650 --column init_nom_prin",
+    compare: "--task-ids 1001,1002 --column amount",
     help: "This contract. No database connection required.",
   },
   examples: [
-    "lineage-graph.ps1 search --text t98_otc_deri_comp_sale_info",
-    "lineage-graph.ps1 trace --table pdata_n.t98_otc_deri_comp_sale_info --layer table --depth 1",
-    "lineage-graph.ps1 trace --task-id 86842 --column init_nom_prin --depth 6",
-    "lineage-graph.ps1 processing --task-id 93338 --text dyna_nom_prin",
+    "lineage-graph.ps1 search --text daily_sales",
+    "lineage-graph.ps1 trace --table dm_demo.daily_sales --layer table --depth 1",
+    "lineage-graph.ps1 trace --task-id 1001 --column amount --depth 6",
+    "lineage-graph.ps1 processing --task-id 1001 --text amount",
   ],
   limits: {
     searchMax: 100,

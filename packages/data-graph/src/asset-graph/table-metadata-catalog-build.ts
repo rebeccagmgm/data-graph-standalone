@@ -22,7 +22,7 @@ import {
 // This is the repository's single DDL definition parser. The catalog persists
 // its output; request-time readers never run the parser.
 // @ts-expect-error JavaScript module has no declaration file in this package.
-import { parseDefinition } from "../../../../scripts/inventory-map/analysis-evidence.mjs";
+import { parseDefinition } from "../../../../scripts/shared/ddl-evidence.mjs";
 import { TABLE_METADATA_CATALOG_SCHEMA_VERSION } from "./table-metadata-catalog.ts";
 
 export interface CatalogBuildScope {
@@ -132,7 +132,7 @@ function replaceCatalogManifest(source: string, destination: string): void {
 
 const PARSER_PATH = resolve(
   MODULE_ROOT,
-  "../../../../scripts/inventory-map/analysis-evidence.mjs",
+  "../../../../scripts/shared/ddl-evidence.mjs",
 );
 const text = (value: unknown) =>
   typeof value === "string" ? value.trim() : "";
