@@ -6,7 +6,7 @@ export const CLI_HELP = {
   commands: {
     status: "Publication version and coverage.",
     metrics:
-      "Read-only published INDEX metrics, without Neo4j; [--gap-layer boundary|actionable|material|unclassified --reason-code CODE OR --terminal-role REFERENCE_CONFIG --offset 0 --limit 25]",
+      "Read-only published INDEX metrics, without a graph database connection; [--gap-layer boundary|actionable|material|unclassified --reason-code CODE OR --terminal-role REFERENCE_CONFIG --offset 0 --limit 25]",
     "query-read-candidates":
       "--read-occurrence-id <id> [--consumer-task-id <id>] [--publication-version <version>] [--offset 0 --limit 25]; reads only the pinned published INDEX.",
     search: "--text <task/table/name> [--limit 25 --offset 0]",

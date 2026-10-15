@@ -29,7 +29,7 @@ export const CONTINUATION_GAP_LAYERS = [
 ] as const;
 export type ContinuationGapLayer = (typeof CONTINUATION_GAP_LAYERS)[number];
 
-/** Read one immutable published snapshot. Never prepare or contact Neo4j. */
+/** Read one immutable published snapshot. Never prepare or contact the database. */
 export function readPublishedContinuationMetrics(input: {
   graphOutputRoot: string;
   gapLayer?: string;

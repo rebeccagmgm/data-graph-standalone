@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataRoot": "../.runtime",
+  "evidenceRoot": "../.runtime/evidence",
+  "inputPackRoot": "input-packs",
+  "factsRoot": "facts",
+  "projectionRoot": "projections",
+  "graphRoot": "graphs",
+  "writerCatalogPath": "writer-catalog.json",
+  "activeProfile": "example",
+  "profiles": { "example": { "batch": "example" } },
+  "graphDatabase": {
+    "provider": "arcadedb",
+    "uri": "http://127.0.0.1:2480",
+    "username": "reader",
+    "database": "example_graph",
+    "graphId": "example",
+    "passwordFile": "../.runtime/arcadedb.password",
+    "passwordFileEnv": "ARCADEDB_PASSWORD_FILE"
+  }
+}

@@ -1,5 +1,5 @@
 import { clusterParams, clusterTablePredicate, clusterTaskPredicate } from "./cluster-filter.ts";
-import { int, type Driver } from "neo4j-driver";
+import type { GraphConnection } from "../arcadedb/connection.ts";
 import type { AssetNode, AssetEdge, CompiledTask } from "./compile.ts";
 import { parseTaskTableId, physicalTableNodeId } from "./task-table-context.ts";
 import { traverseTaskTables, type TableNode, type TableEdge, type TableTraversalReader } from "./task-table-traversal.ts";
@@ -49,7 +49,7 @@ function countDelta(
 
 export class AssetGraphStore {
   constructor(
-    readonly driver: Driver,
+    readonly driver: GraphConnection,
     readonly database: string,
     readonly graphId: string,
   ) {}
@@ -60,10 +60,10 @@ export class AssetGraphStore {
         graphId: this.graphId,
         ...params,
         ...(typeof params.limit === "number"
-          ? { limit: int(params.limit) }
+          ? { limit: params.limit }
           : {}),
         ...(typeof params.offset === "number"
-          ? { offset: int(params.offset) }
+          ? { offset: params.offset }
           : {}),
       });
     } finally {
@@ -138,7 +138,7 @@ export class AssetGraphStore {
             "UNWIND $rows AS row MATCH (o:SLAssetOwner {key:row.key}) WHERE o.hash=row.hash AND o.edgeSourceKeys IS NULL SET o.edgeSourceKeys=row.sources RETURN count(o) AS updated",
             { rows: batch },
           );
-          if (result.records[0]!.get("updated").toNumber() !== batch.length)
+          if (Number(result.records[0]!.get("updated")) !== batch.length)
             throw new Error("ASSET_OWNER_METADATA_CHANGED");
         }
         return rows.size;
@@ -218,7 +218,7 @@ export class AssetGraphStore {
               })),
             },
           );
-          if (result.records[0]!.get("written").toNumber() !== batch.length)
+          if (Number(result.records[0]!.get("written")) !== batch.length)
             throw new Error("ASSET_EDGE_ENDPOINT_MISSING");
         }
       });
@@ -279,10 +279,10 @@ export class AssetGraphStore {
     );
     return {
       nodes: Object.fromEntries(
-        n.records.map((r) => [r.get("kind"), r.get("count").toNumber()]),
+        n.records.map((r) => [r.get("kind"), Number(r.get("count"))]),
       ),
       edges: Object.fromEntries(
-        e.records.map((r) => [r.get("kind"), r.get("count").toNumber()]),
+        e.records.map((r) => [r.get("kind"), Number(r.get("count"))]),
       ),
     };
   }

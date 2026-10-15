@@ -9,11 +9,13 @@ artifacts/
 studies/
 tmp/
 outputs/
-config/
+/config/*
+!/config/workspace.example.json
 tests/
 fixtures/
 .agents/
 .evidence-cache/
+/.runtime/
 .env
 .env.*
 *.tsbuildinfo

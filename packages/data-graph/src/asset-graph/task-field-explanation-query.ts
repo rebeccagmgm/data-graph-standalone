@@ -34,7 +34,7 @@ export async function queryTaskFieldExplanation(
       readIdentities.set(occurrenceId, reads[0]!.properties.physicalDataset);
   }
   const result = explainTaskField(readJson<Evidence>(task.evidencePath), { taskId: input.taskId, writeId: input.writeId, column: input.column, version }, limits,
-    projectionGaps ?? [], readIdentities);
+    (projectionGaps ?? []).map(gap => ({ ...gap })), readIdentities);
   // Use the published occurrence identity, never a second table-name resolver.
   for (const stage of result.stages) {
     if (!stage.readOccurrenceId) continue;

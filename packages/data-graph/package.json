@@ -17,10 +17,8 @@
     "field-evidence-graph": "tsx src/project-graph/field-evidence/field-evidence-cli.ts",
     "target-causal-overlay": "tsx src/project-graph/target-causal-overlay/target-causal-overlay-cli.ts",
     "union-continuation-v2": "tsx src/project-graph/topology/task-local-union/union-continuation-v2-cli.ts",
-    "union-continuation-index": "tsx src/project-graph/topology/task-local-union/union-continuation-index-cli.ts"
-  },
-  "dependencies": {
-    "neo4j-driver": "^6.2.0"
+    "union-continuation-index": "tsx src/project-graph/topology/task-local-union/union-continuation-index-cli.ts",
+    "test:http": "node --experimental-transform-types --test src/arcadedb/connection.test.mts"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
@@ -28,5 +26,8 @@
     "tsx": "^4.22.4",
     "typescript": "^7.0.2",
     "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

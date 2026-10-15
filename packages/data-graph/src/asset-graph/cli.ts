@@ -75,7 +75,7 @@ export function parseAgentArgs(args: readonly string[]) {
 export async function assetGraphMain(args = process.argv.slice(2)) {
   const started = Date.now();
   let command = args[0] ?? "help";
-  let backend = "neo4j";
+  let backend = "arcadedb";
   try {
     const a = parseAgentArgs(args);
     command = a.command;

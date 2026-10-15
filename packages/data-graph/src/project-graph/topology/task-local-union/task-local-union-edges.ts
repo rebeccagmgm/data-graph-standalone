@@ -43,8 +43,8 @@ export interface TaskLocalUnionDerivedEdge {
   readonly evidenceStatus: "CONFIRMED" | "CANDIDATE";
 }
 
-/** Neo4j / query-index labels reuse existing data-graph edgeType strings. */
-export const TASK_LOCAL_UNION_NEO4J_EDGE_LABELS = {
+/** Graph storage labels reuse existing data-graph edgeType strings. */
+export const TASK_LOCAL_UNION_GRAPH_EDGE_LABELS = {
   local: TASK_LOCAL_UNION_LOCAL_EDGE_TYPES,
   derived: TASK_LOCAL_UNION_DERIVED_EDGE_TYPES,
 } as const;
